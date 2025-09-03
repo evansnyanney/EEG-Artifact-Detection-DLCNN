@@ -7,9 +7,9 @@
 
 This repository implements end-to-end EEG artifact detection using an Enhanced Deep Lightweight 1D Convolutional Neural Network (EDL-CNN), together with literature-based rule methods. It targets three artifact categories derived from TUH annotations:
 
-- Eye movements
-- Muscle (EMG) artifacts
-- Non-physiological artifacts (e.g., electrode noise/pops)
+- Eye movements (TARGETED: EYE)
+- Muscle (EMG) artifacts (TARGETED: MUSC, CHEW, SHIV)
+- Non-physiological artifacts (TARGETED: ELEC, ELPP)
 
 The pipeline includes preprocessing, binary dataset preparation per target, model training, threshold calibration on validation data, final evaluation on held-out test data, optional window-size sweeps, and comparison against rule-based detectors.
 
