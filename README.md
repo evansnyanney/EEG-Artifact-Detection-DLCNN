@@ -2,7 +2,6 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 ![Python Version](https://img.shields.io/badge/python-3.9%2B-blue)
-![GitHub Repo size](https://img.shields.io/github/repo-size/ZhaohuiGeng/artifact_identification)
 ![GitHub stars](https://img.shields.io/github/stars/ZhaohuiGeng/artifact_identification?style=social)
 ![GitHub forks](https://img.shields.io/github/forks/ZhaohuiGeng/artifact_identification?style=social)
 
