@@ -1,4 +1,4 @@
-# EEG Artifact Detection (EDL-CNN)
+# Deep Lightweight CNN for EEG Artifact Detection
 
 This repository implements end-to-end EEG artifact detection using an Enhanced Deep Lightweight 1D Convolutional Neural Network (EDL-CNN), together with literature-based rule methods. It targets three artifact categories derived from TUH annotations:
 
