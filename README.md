@@ -1,5 +1,11 @@
 # Deep Lightweight CNN for EEG Artifact Detection
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+![Python Version](https://img.shields.io/badge/python-3.9%2B-blue)
+![GitHub Repo size](https://img.shields.io/github/repo-size/ZhaohuiGeng/artifact_identification)
+![GitHub stars](https://img.shields.io/github/stars/ZhaohuiGeng/artifact_identification?style=social)
+![GitHub forks](https://img.shields.io/github/forks/ZhaohuiGeng/artifact_identification?style=social)
+
 This repository implements end-to-end EEG artifact detection using an Enhanced Deep Lightweight 1D Convolutional Neural Network (EDL-CNN), together with literature-based rule methods. It targets three artifact categories derived from TUH annotations:
 
 - Eye movements
@@ -8,13 +14,26 @@ This repository implements end-to-end EEG artifact detection using an Enhanced D
 
 The pipeline includes preprocessing, binary dataset preparation per target, model training, threshold calibration on validation data, final evaluation on held-out test data, optional window-size sweeps, and comparison against rule-based detectors.
 
+## Table of Contents
+- [Installation](#installation)
+- [Data note](#data-note)
+- [Repository Structure (selected)](#repository-structure-selected)
+- [Methodological Summary](#methodological-summary)
+- [Typical Workflow](#typical-workflow)
+- [Notes on Models and Checkpoints](#notes-on-models-and-checkpoints)
+- [Metrics and Reporting](#metrics-and-reporting)
+- [Citation](#citation)
+- [License](#license)
+
 ## Installation
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Data note: raw TUH data and large artifacts are excluded from version control. Download TUH separately and place the required EDF files and CSV annotations under a local folder named `edf/` (create it if needed). Any substructure is acceptable as long as file paths used in your environment are consistent.
+## Data note
+
+Raw TUH data and large artifacts are excluded from version control. Download TUH separately and place the required EDF files and CSV annotations under a local folder named `edf/` (create it if needed). Any substructure is acceptable as long as file paths used in your environment are consistent.
 
 ## Repository Structure (selected)
 
