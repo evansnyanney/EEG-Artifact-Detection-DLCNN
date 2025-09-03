@@ -1,6 +1,6 @@
 # EEG Artifact Detection (EDL-CNN)
 
-This repository implements end-to-end EEG artifact detection using a lightweight 1D Convolutional Neural Network (EDL-CNN) and literature-based rule methods. It targets three artifact categories derived from TUH annotations:
+This repository implements end-to-end EEG artifact detection using an Enhanced Deep Lightweight 1D Convolutional Neural Network (EDL-CNN), together with literature-based rule methods. It targets three artifact categories derived from TUH annotations:
 
 - Eye movements
 - Muscle (EMG) artifacts
@@ -14,7 +14,7 @@ The pipeline includes preprocessing, binary dataset preparation per target, mode
 pip install -r requirements.txt
 ```
 
-Place TUH EDF files and corresponding CSV annotations under `edf/` (any substructure is acceptable as long as file paths used in your environment are consistent).
+Data note: raw TUH data and large artifacts are excluded from version control. Download TUH separately and place the required EDF files and CSV annotations under a local folder named `edf/` (create it if needed). Any substructure is acceptable as long as file paths used in your environment are consistent.
 
 ## Repository Structure (selected)
 
@@ -69,7 +69,7 @@ python evaluate_cnn_vs_rules.py
 5) Optional: Sweep window sizes and summarize:
 ```bash
 python window_optimization_script.py --target all --force
-``;
+```
 
 ## Notes on Models and Checkpoints
 
@@ -87,7 +87,7 @@ Plots saved per run include training history, ROC/PR curves, confusion matrix, a
 If this repository is useful in your work, please cite:
 
 ```
-Nyanney E., Geng Z., Thirumala P. (2024). EEG Artifact Detection with EDL-CNN
+Nyanney E., Geng Z., Thirumala P. (2025). EEG Artifact Detection with EDL-CNN
 and Literature-Based Rules. GitHub repository: https://github.com/ZhaohuiGeng/artifact_identification
 ```
 
