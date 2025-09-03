@@ -1,0 +1,29 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Data and caches
+cache/
+checkpoints/
+*.weights.h5
+*.keras
+*.npy
+*.npz
+*.joblib
+*.pickle
+*.pkl
+*.csv
+
+# Raw data folders (TUH subset)
+edf/
+
+# Plots and large images (optional)
+*.png
+*.jpg
+*.jpeg
+
+# OS/Editor
+.DS_Store
+.env
+*.log
