@@ -15,8 +15,7 @@ Key Features:
 - Global normalization using RobustScaler for consistent preprocessing
 
 Authors: Evans Nyanney, Zhaohui Geng, Parthasarathy Thirumala
-Year: 2024
-License: MIT
+Year: 2025
 """
 
 import os
@@ -67,7 +66,7 @@ class EEGPreprocessingPipeline:
         min_artifact_duration (float): Minimum duration for valid artifacts.
         include_clean_windows (bool): Whether to include clean segments.
         clean_label (int): Label assigned to clean windows.
-        verbose (bool): Enable verbose output.
+    
     """
 
     # Configuration
@@ -192,7 +191,7 @@ class EEGPreprocessingPipeline:
 
         if not bipolar_channels:
             if self.logger:
-                self.logger.warning("No valid bipolar pairs found; using original channels.")
+                self.logger.warning("If No valid bipolar pairs found; using original channels.")
             return raw
 
         result = mne.set_bipolar_reference(
@@ -264,7 +263,7 @@ class EEGPreprocessingPipeline:
     def standardize_channels(self, raw: mne.io.Raw) -> mne.io.Raw:
         """
         Standardize channels to canonical 22-channel bipolar montage.
-        Corrects the critical bug in padding logic.
+    
         """
         # Clean and standardize channel names
         raw.rename_channels(lambda x: x.replace('EEG ', '').replace('-REF', '').upper())
@@ -475,9 +474,9 @@ class EEGPreprocessingPipeline:
         }
 
     def prepare_training_data(self, results: Dict[str, Any]) -> Dict[str, Any]:
-        """Prepare data for 1D CNN training with patient-level splitting."""
+        """Prepare data for Enhanced Deep lightweight CNN training with patient-level splitting."""
         if self.logger:
-            self.logger.info("Preparing training data for 1D CNN...")
+            self.logger.info("Preparing training data for Enhanced Deep lightweight CNN...")
 
         data_list = [w[0] for w in results['windows']]
         labels = [w[1] for w in results['windows']]

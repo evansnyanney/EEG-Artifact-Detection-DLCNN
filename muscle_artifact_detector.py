@@ -4,21 +4,20 @@
 """
 Muscle Artifact Detector using Enhanced Deep Lightweight CNN (EDL-CNN)
 
-This module implements a lightweight Convolutional Neural Network (CNN) for detecting
+This module implements a Enhanced Deep lightweight Convolutional Neural Network (CNN) for detecting
 muscle artifacts in EEG signals via binary classification. The model emphasizes
-simplicity and generalization through minimal regularization and patient-level data
+ and generalization through no regularization and patient-level data
 splitting to prevent leakage.
 
 Key Features:
 - Lightweight 1D-CNN architecture (no dropout, no L2 regularization)
 - Three-way data split (train/validation/test) stratified by patient
 - Threshold selection via Youden's J, fixed specificity, or max TPR under FPR constraint
-- Comprehensive evaluation: PR-AUC, prevalence-adjusted PR-AUC, partial ROC-AUC
+-  Evaluation: PR-AUC, prevalence-adjusted PR-AUC, partial ROC-AUC
 - Visualization of training history, ROC, PR, confusion matrix, and prediction distributions
 
 Authors: Evans Nyanney, Zhaohui Geng, Parthasarathy Thirumala
-Year: 2024
-License: MIT (add if applicable)
+Year: 2025
 """
 
 import os
@@ -56,6 +55,53 @@ warnings.filterwarnings('ignore')
 tf.random.set_seed(42)
 np.random.seed(42)
 random.seed(42)
+
+
+def focal_loss_with_class_weights(alpha=0.25, gamma=2.0, class_weights=None):
+    """
+    Create a focal loss function with class weights for imbalanced binary classification.
+    
+    Args:
+        alpha (float): Weighting factor for rare class
+        gamma (float): Focusing parameter
+        class_weights (dict): Additional class weights {0: weight_0, 1: weight_1}
+    
+    Returns:
+        callable: Focal loss function compatible with Keras
+    """
+    def focal_loss_weighted(y_true, y_pred):
+        """
+        Focal loss with class weights implementation.
+        FL(p_t) = -α_t * (1 - p_t)^γ * log(p_t)
+        """
+        # Clip predictions to prevent log(0)
+        y_pred = tf.keras.backend.clip(y_pred, tf.keras.backend.epsilon(), 1.0 - tf.keras.backend.epsilon())
+        
+        # Calculate p_t
+        p_t = tf.where(tf.equal(y_true, 1), y_pred, 1 - y_pred)
+        
+        # Calculate alpha_t
+        alpha_t = tf.where(tf.equal(y_true, 1), alpha, 1 - alpha)
+        
+        # Calculate focal loss
+        focal_loss = -alpha_t * tf.keras.backend.pow(1 - p_t, gamma) * tf.keras.backend.log(p_t)
+        
+        # Apply additional class weights if provided
+        if class_weights is not None:
+            # Convert string keys to integers if needed
+            weight_1 = class_weights.get(1, class_weights.get("1", 1.0))
+            weight_0 = class_weights.get(0, class_weights.get("0", 1.0))
+            
+            class_weight_tensor = tf.where(
+                tf.equal(y_true, 1), 
+                weight_1, 
+                weight_0
+            )
+            focal_loss = focal_loss * class_weight_tensor
+        
+        return tf.keras.backend.mean(focal_loss)
+    
+    return focal_loss_weighted
 
 # Configure logging
 logging.basicConfig(
@@ -105,7 +151,7 @@ class MuscleArtifactDetector:
     """
     Enhanced Deep Lightweight CNN (EDL-CNN) for binary classification of muscle artifacts in EEG.
 
-    This detector uses a minimalistic CNN architecture to classify EEG segments as either
+    This detector uses a Enhanced Deep lightweight CNN architecture to classify EEG segments as either
     containing muscle artifacts or being clean. It supports configurable threshold
     selection and comprehensive evaluation metrics.
 
@@ -121,18 +167,17 @@ class MuscleArtifactDetector:
 
     def __init__(self, model_name: str = "muscle_artifact_detector", verbose: bool = True) -> None:
         self.model_name = model_name
-        self.model = None
-        self.history = None
-        self.metadata = None
         self.verbose = verbose
+        self.model: Optional[tf.keras.Model] = None
+        self.history: Optional[tf.keras.callbacks.History] = None
+        self.metadata: Dict[str, Any] = {}
+        self.X_train = self.X_val = self.X_test = None
+        self.y_train = self.y_val = self.y_test = None
 
-        self.X_train = None
-        self.X_val = None
-        self.X_test = None
-        self.y_train = None
-        self.y_val = None
-        self.y_test = None
-
+        # Results directory for this model
+        self.results_dir = os.path.join('results', self.model_name)
+        os.makedirs(self.results_dir, exist_ok=True)
+        
         self.logger = logging.getLogger(self.__class__.__name__)
         if not verbose:
             self.logger.setLevel(logging.WARNING)
@@ -154,14 +199,14 @@ class MuscleArtifactDetector:
             FileNotFoundError: If required files are missing.
         """
         self.logger.info(f"Loading data from: {data_dir}")
-
+        
         # Load metadata
         metadata_path = os.path.join(data_dir, "metadata.json")
         if not os.path.exists(metadata_path):
             raise FileNotFoundError(f"Metadata not found at {metadata_path}")
         with open(metadata_path, 'r') as f:
             self.metadata = json.load(f)
-
+        
         # Load 3D EEG data (samples, time_steps, channels)
         X_train_full = np.load(os.path.join(data_dir, "X_train_3d.npy"))
         X_test_full = np.load(os.path.join(data_dir, "X_test_3d.npy"))
@@ -171,7 +216,7 @@ class MuscleArtifactDetector:
         # Combine and split: 60% train, 20% val, 20% test
         X_combined = np.vstack([X_train_full, X_test_full])
         y_combined = np.hstack([y_train_full, y_test_full])
-
+        
         X_temp, self.X_test, y_temp, self.y_test = train_test_split(
             X_combined, y_combined,
             test_size=0.2,
@@ -184,17 +229,17 @@ class MuscleArtifactDetector:
             random_state=42,
             stratify=y_temp
         )
-
+        
         self.logger.info(f"Training set: {self.X_train.shape}")
         self.logger.info(f"Validation set: {self.X_val.shape}")
         self.logger.info(f"Test set: {self.X_test.shape}")
         self.logger.info(f"Dataset: {self.metadata.get('description', 'Unknown')}")
-
+        
         return self.X_train, self.X_val, self.X_test, self.y_train, self.y_val, self.y_test
     
     def build_model(self, input_shape: Optional[Tuple[int, ...]] = None, model_type: str = 'lightweight') -> tf.keras.Model:
         """
-        Build a lightweight CNN for EEG muscle artifact detection.
+        Build a Enhanced Deep lightweight CNN for EEG muscle artifact detection.
 
         Args:
             input_shape (tuple, optional): Shape of input (timesteps, channels). Inferred if None.
@@ -241,12 +286,24 @@ class MuscleArtifactDetector:
             raise ValueError(f"Unknown model_type: {model_type}")
 
         optimizer = optimizers.Adam(learning_rate=1e-3)
+        
+        # Get focal loss parameters from metadata
+        focal_params = self.metadata.get('focal_loss_params', {'gamma': 2.0, 'alpha': 0.25})
+        class_weights = self.metadata.get('class_weights', {0: 1.0, 1: 1.0})
+        
+        # Create focal loss function
+        focal_loss_fn = focal_loss_with_class_weights(
+            alpha=focal_params['alpha'],
+            gamma=focal_params['gamma'],
+            class_weights=class_weights
+        )
+        
         model.compile(
             optimizer=optimizer,
-            loss='binary_crossentropy',
+            loss=focal_loss_fn,
             metrics=['accuracy', 'precision', 'recall']
         )
-
+        
         self.model = model
         self.logger.info(f"Model built. Total parameters: {model.count_params():,}")
         return model
@@ -296,7 +353,7 @@ class MuscleArtifactDetector:
                 verbose=1 if self.verbose else 0
             )
         ]
-
+        
         self.history = self.model.fit(
             self.X_train,
             self.y_train,
@@ -307,7 +364,7 @@ class MuscleArtifactDetector:
             verbose=1,
             shuffle=True
         )
-
+        
         self.logger.info("Training completed.")
         return self.history
     
@@ -469,7 +526,7 @@ class MuscleArtifactDetector:
         plt.title('PR Curve (Validation) - F1-Optimal Threshold')
         plt.legend()
         plt.grid(True)
-        plt.savefig(f"{self.model_name}_pr_curve.png", dpi=300, bbox_inches='tight')
+        plt.savefig(os.path.join(self.results_dir, f"{self.model_name}_pr_curve.png"), dpi=300, bbox_inches='tight')
         plt.close()
     
     def _save_evaluation_plots(
@@ -519,7 +576,7 @@ class MuscleArtifactDetector:
 
         plt.suptitle('Comprehensive Evaluation - Muscle Artifact Detector', fontsize=16, fontweight='bold')
         plt.tight_layout()
-        plt.savefig(f"{self.model_name}_comprehensive_evaluation.png", dpi=300, bbox_inches='tight')
+        plt.savefig(os.path.join(self.results_dir, f"{self.model_name}_comprehensive_evaluation.png"), dpi=300, bbox_inches='tight')
         plt.close()
     
     def plot_training_history(self) -> None:
@@ -548,7 +605,7 @@ class MuscleArtifactDetector:
 
         plt.suptitle('Training History', fontsize=16, fontweight='bold')
         plt.tight_layout()
-        plt.savefig(f"{self.model_name}_training_history.png", dpi=300, bbox_inches='tight')
+        plt.savefig(os.path.join(self.results_dir, f"{self.model_name}_training_history.png"), dpi=300, bbox_inches='tight')
         plt.show()
     
     def save_model(self, filepath: Optional[str] = None) -> None:
@@ -559,13 +616,13 @@ class MuscleArtifactDetector:
             filepath (str, optional): Path to save the model. Defaults to `{model_name}.keras`.
         """
         if filepath is None:
-            filepath = f"{self.model_name}.keras"
-
+            filepath = os.path.join(self.results_dir, f"{self.model_name}.keras")
+        
         self.model.save(filepath)
         self.logger.info(f"Model saved to {filepath}")
 
         if self.history:
-            hist_path = f"{self.model_name}_history.json"
+            hist_path = os.path.join(self.results_dir, f"{self.model_name}_history.json")
             with open(hist_path, 'w') as f:
                 json.dump(self.history.history, f, indent=2)
             self.logger.info(f"Training history saved to {hist_path}")
@@ -585,11 +642,11 @@ def main() -> None:
 
     # Evaluate
     results = detector.evaluate()
-
+    
     # Plot results
     detector.plot_training_history()
     detector.save_model()
-
+    
     logger.info("Muscle artifact detector training and evaluation completed.")
 
 

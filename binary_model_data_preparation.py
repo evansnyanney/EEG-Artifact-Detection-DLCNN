@@ -14,8 +14,7 @@ Key Features:
 - Metadata generation for reproducible model training
 
 Authors: Evans Nyanney, Zhaohui Geng, Parthasarathy Thirumala
-Year: 2024
-License: MIT
+Year: 2025
 """
 
 import os
@@ -221,7 +220,7 @@ def main() -> None:
     """Main execution function."""
     logger.info("Starting binary model data preparation")
 
-    preparer = BinaryModelDataPreparer(input_dir='.', output_dir='binary_models_data')
+    preparer = BinaryModelDataPreparer(input_dir='binary_models_data', output_dir='binary_models_data')
     preparer.load_data()
     preparer.prepare_all_models()
     preparer.analyze_data()
@@ -229,11 +228,11 @@ def main() -> None:
     print("\n" + "="*70)
     print("BINARY MODEL DATA PREPARATION COMPLETED")
     print("="*70)
-    print("Three binary models are ready for training:")
+    print("Three binary models for training:")
     print("  1. Eye Movement Detector")
     print("  2. Muscle Artifact Detector")
     print("  3. Non-Physiological Detector (includes electrode artifacts)")
-    print("\nData format: 3D (n_samples, n_timepoints, n_channels) for 1D CNN")
+    print("\nData format: 3D (n_samples, n_timepoints, n_channels) for Enhanced Deep lightweight CNN")
     print("All metadata, splits, and class weights saved.")
     print("="*70)
 

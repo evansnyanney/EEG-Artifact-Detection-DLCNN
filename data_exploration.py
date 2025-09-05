@@ -15,8 +15,7 @@ Key Features:
 - Artifact pattern analysis: co-occurrence, timing, combinations
 
 Authors: Evans Nyanney, Zhaohui Geng, Parthasarathy Thirumala
-Year: 2024
-License: MIT
+Year: 2025
 """
 
 import os
@@ -491,7 +490,7 @@ def main() -> Dict[str, Any]:
         print("\n" + "=" * 80)
         print("COMPREHENSIVE EEG DATA ANALYSIS COMPLETED!")
         print("=" * 80)
-        print("Use these insights to:")
+        print("Using these insights to:")
         print("   - Design preprocessing pipelines")
         print("   - Choose model architectures")
         print("   - Evaluate data quality")

@@ -2,8 +2,8 @@
 """
 Muscle Artifact Detector using Enhanced Deep Lightweight CNN (EDL-CNN)
 
-A lightweight 1D Convolutional Neural Network (CNN) for detecting muscle artifacts in EEG data
-via binary classification. The model uses minimal regularization and patient-level data splitting
+A lightweight Enhanced Deep Convolutional Neural Network (CNN) for detecting muscle artifacts in EEG data
+via binary classification. The model uses no regularization and patient-level data splitting
 to ensure robust generalization.
 
 Key Features:
@@ -14,8 +14,7 @@ Key Features:
 - Visualization: ROC, PR, confusion matrix, prediction distribution, training history
 
 Authors: Evans Nyanney, Zhaohui Geng, Parthasarathy Thirumala
-Year: 2024
-License: MIT
+Year: 2025
 """
 
 import os
@@ -53,6 +52,53 @@ tf.random.set_seed(42)
 np.random.seed(42)
 random.seed(42)
 
+
+def focal_loss_with_class_weights(alpha=0.25, gamma=2.0, class_weights=None):
+    """
+    Create a focal loss function with class weights for imbalanced binary classification.
+    
+    Args:
+        alpha (float): Weighting factor for rare class
+        gamma (float): Focusing parameter
+        class_weights (dict): Additional class weights {0: weight_0, 1: weight_1}
+    
+    Returns:
+        callable: Focal loss function compatible with Keras
+    """
+    def focal_loss_weighted(y_true, y_pred):
+        """
+        Focal loss with class weights implementation.
+        FL(p_t) = -α_t * (1 - p_t)^γ * log(p_t)
+        """
+        # Clip predictions to prevent log(0)
+        y_pred = tf.keras.backend.clip(y_pred, tf.keras.backend.epsilon(), 1.0 - tf.keras.backend.epsilon())
+        
+        # Calculate p_t
+        p_t = tf.where(tf.equal(y_true, 1), y_pred, 1 - y_pred)
+        
+        # Calculate alpha_t
+        alpha_t = tf.where(tf.equal(y_true, 1), alpha, 1 - alpha)
+        
+        # Calculate focal loss
+        focal_loss = -alpha_t * tf.keras.backend.pow(1 - p_t, gamma) * tf.keras.backend.log(p_t)
+        
+        # Apply additional class weights if provided
+        if class_weights is not None:
+            # Convert string keys to integers if needed
+            weight_1 = class_weights.get(1, class_weights.get("1", 1.0))
+            weight_0 = class_weights.get(0, class_weights.get("0", 1.0))
+            
+            class_weight_tensor = tf.where(
+                tf.equal(y_true, 1), 
+                weight_1, 
+                weight_0
+            )
+            focal_loss = focal_loss * class_weight_tensor
+        
+        return tf.keras.backend.mean(focal_loss)
+    
+    return focal_loss_weighted
+
 # Configure global logging
 logging.basicConfig(
     level=logging.INFO,
@@ -60,10 +106,10 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-__all__ = ['MuscleArtifactDetector']
+__all__ = ['EyeMovementDetector']
 
 
-class MuscleArtifactDetector:
+class EyeMovementDetector:
     """
     Enhanced Deep Lightweight CNN (EDL-CNN) for binary classification of muscle artifacts in EEG.
 
@@ -81,7 +127,7 @@ class MuscleArtifactDetector:
         
     """
 
-    def __init__(self, model_name: str = "muscle_artifact_detector", verbose: bool = True) -> None:
+    def __init__(self, model_name: str = "edl_cnn_eye", verbose: bool = True) -> None:
         self.model_name = model_name
         self.model = None
         self.history = None
@@ -101,7 +147,10 @@ class MuscleArtifactDetector:
         if not verbose:
             self.logger.setLevel(logging.WARNING)
 
-    def load_data(self, data_dir: str = "binary_models_data/muscle_artifacts") -> Tuple[
+        self.results_dir = os.path.join('results', self.model_name)
+        os.makedirs(self.results_dir, exist_ok=True)
+
+    def load_data(self, data_dir: str = "binary_models_data/eye_movement") -> Tuple[
         np.ndarray, np.ndarray, np.ndarray,
         np.ndarray, np.ndarray, np.ndarray
     ]:
@@ -117,15 +166,15 @@ class MuscleArtifactDetector:
         Raises:
             FileNotFoundError: If metadata or data files are missing.
         """
-        self.logger.info(f"Loading muscle artifact data from: {data_dir}")
-
+        self.logger.info(f"Loading eye movement data from: {data_dir}")
+        
         # Load metadata
         metadata_path = os.path.join(data_dir, "metadata.json")
         if not os.path.exists(metadata_path):
             raise FileNotFoundError(f"Metadata not found at {metadata_path}")
         with open(metadata_path, 'r') as f:
             self.metadata = json.load(f)
-
+        
         # Load 3D EEG data (samples, timesteps, channels)
         X_train_full = np.load(os.path.join(data_dir, "X_train_3d.npy"))
         X_test_full = np.load(os.path.join(data_dir, "X_test_3d.npy"))
@@ -135,7 +184,7 @@ class MuscleArtifactDetector:
         # Combine and split: 60% train, 20% val, 20% test
         X_combined = np.vstack([X_train_full, X_test_full])
         y_combined = np.hstack([y_train_full, y_test_full])
-
+        
         X_temp, self.X_test, y_temp, self.y_test = train_test_split(
             X_combined, y_combined,
             test_size=0.2,
@@ -153,12 +202,12 @@ class MuscleArtifactDetector:
         self.logger.info(f"Validation set: {self.X_val.shape}")
         self.logger.info(f"Test set: {self.X_test.shape}")
         self.logger.info(f"Dataset: {self.metadata.get('description', 'Unknown')}")
-
+        
         return self.X_train, self.X_val, self.X_test, self.y_train, self.y_val, self.y_test
-
+    
     def build_model(self, input_shape: Optional[Tuple[int, ...]] = None, model_type: str = 'lightweight') -> tf.keras.Model:
         """
-        Build a lightweight CNN for muscle artifact detection.
+        Build a Enhanced Deep lightweight CNN for muscle artifact detection.
 
         Args:
             input_shape (tuple, optional): Shape of input (timesteps, channels). Inferred from data if None.
@@ -201,16 +250,28 @@ class MuscleArtifactDetector:
             raise ValueError(f"Unknown model_type: {model_type}")
 
         optimizer = optimizers.Adam(learning_rate=1e-3)
+        
+        # Get focal loss parameters from metadata
+        focal_params = self.metadata.get('focal_loss_params', {'gamma': 2.0, 'alpha': 0.25})
+        class_weights = self.metadata.get('class_weights', {0: 1.0, 1: 1.0})
+        
+        # Create focal loss function
+        focal_loss_fn = focal_loss_with_class_weights(
+            alpha=focal_params['alpha'],
+            gamma=focal_params['gamma'],
+            class_weights=class_weights
+        )
+        
         model.compile(
             optimizer=optimizer,
-            loss='binary_crossentropy',
+            loss=focal_loss_fn,
             metrics=['accuracy', 'precision', 'recall']
         )
-
+        
         self.model = model
         self.logger.info(f"Model built. Total parameters: {model.count_params():,}")
         return model
-
+    
     def train(
         self,
         epochs: int = 200,
@@ -229,7 +290,7 @@ class MuscleArtifactDetector:
         self.logger.info(f"Starting training: epochs={epochs}, batch_size={batch_size}")
 
         run_id = int(time.time())
-        ckpt_dir = os.path.join('checkpoints', 'muscle')
+        ckpt_dir = os.path.join('checkpoints', 'eye_movement')
         os.makedirs(ckpt_dir, exist_ok=True)
         ckpt_path = os.path.join(ckpt_dir, f"{self.model_name}_best_{run_id}.weights.h5")
 
@@ -248,12 +309,6 @@ class MuscleArtifactDetector:
                 save_best_only=True,
                 save_weights_only=True,
                 verbose=1 if self.verbose else 0
-            ),
-            callbacks.EarlyStopping(
-                monitor='val_loss',
-                patience=5,
-                restore_best_weights=True,
-                verbose=1 if self.verbose else 0
             )
         ]
 
@@ -267,10 +322,10 @@ class MuscleArtifactDetector:
             verbose=1,
             shuffle=True
         )
-
+        
         self.logger.info("Training completed.")
         return self.history
-
+    
     def evaluate(self) -> Dict[str, Any]:
         """
         Evaluate the model on the test set using validation-set optimized thresholds.
@@ -317,7 +372,7 @@ class MuscleArtifactDetector:
                 chosen_thr = thr_roc[mask][idx]
                 chosen_mode = f"fixed_spec@{fixed_spec:.2f}"
             else:
-                self.logger.warning("Fixed specificity not achievable; falling back to Youden.")
+                self.logger.warning("If Fixed specificity not achieve; falling back to Youden.")
                 chosen_mode = "youden(fallback)"
         elif mode in ('max_tpr_at_fpr', 'max_tpr_at_fpr_le'):
             mask = fpr <= max_fpr_val
@@ -325,8 +380,8 @@ class MuscleArtifactDetector:
                 idx = np.argmax(tpr[mask])
                 chosen_thr = thr_roc[mask][idx]
                 chosen_mode = f"max_tpr_at_fpr<={max_fpr_val:.2f}"
-            else:
-                self.logger.warning("Max TPR at FPR constraint not feasible; falling back to Youden.")
+        else:
+                self.logger.warning("If Max TPR at FPR constraint not feasible; falling back to Youden.")
                 chosen_mode = "youden(fallback)"
 
         y_pred_test = (y_proba_test >= chosen_thr).astype(int)
@@ -395,7 +450,7 @@ class MuscleArtifactDetector:
         print(f"Sensitivity  : {sensitivity:.4f}")
         print(f"Specificity  : {specificity:.4f}")
         print("\nClassification Report:")
-        print(classification_report(y_true_test, y_pred_test, target_names=['Clean', 'Muscle Artifact']))
+        print(classification_report(y_true_test, y_pred_test, target_names=['Clean', 'Eye Movement']))
         print("Confusion Matrix:")
         print(cm)
 
@@ -406,7 +461,7 @@ class MuscleArtifactDetector:
             cm, chosen_thr, y_proba_test, y_true_test
         )
         self._plot_pr_curve(recall_val, precision_val, best_threshold, best_idx)
-
+        
         return {
             'threshold': float(best_threshold),
             'youden_threshold': float(chosen_thr),
@@ -434,7 +489,7 @@ class MuscleArtifactDetector:
         plt.xlabel('Recall'); plt.ylabel('Precision')
         plt.title('PR Curve (Validation) - F1-Optimal Threshold')
         plt.legend(); plt.grid(True)
-        plt.savefig(f"{self.model_name}_pr_curve.png", dpi=300, bbox_inches='tight')
+        plt.savefig(os.path.join(self.results_dir, f"{self.model_name}_pr_curve.png"), dpi=300, bbox_inches='tight')
         plt.close()
 
     def _save_evaluation_plots(
@@ -468,8 +523,8 @@ class MuscleArtifactDetector:
 
         # Confusion Matrix
         sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', ax=axes[1, 0],
-                    xticklabels=['Clean', 'Muscle Artifact'],
-                    yticklabels=['Clean', 'Muscle Artifact'])
+                    xticklabels=['Clean', 'Eye Movement'],
+                    yticklabels=['Clean', 'Eye Movement'])
         axes[1, 0].set_title(f'Confusion Matrix\nThreshold = {threshold:.3f}')
 
         # Prediction Distribution
@@ -480,9 +535,9 @@ class MuscleArtifactDetector:
         axes[1, 1].set_title('Prediction Distribution (Test)')
         axes[1, 1].legend(); axes[1, 1].grid(True, alpha=0.3)
 
-        plt.suptitle('Comprehensive Evaluation - Muscle Artifact Detector', fontsize=16, fontweight='bold')
+        plt.suptitle('Comprehensive Evaluation - Eye Movement Detector', fontsize=16, fontweight='bold')
         plt.tight_layout()
-        plt.savefig(f"{self.model_name}_comprehensive_evaluation.png", dpi=300, bbox_inches='tight')
+        plt.savefig(os.path.join(self.results_dir, f"{self.model_name}_comprehensive_evaluation.png"), dpi=300, bbox_inches='tight')
         plt.close()
 
     def plot_training_history(self) -> None:
@@ -490,7 +545,7 @@ class MuscleArtifactDetector:
         if self.history is None:
             self.logger.warning("No training history available.")
             return
-
+        
         hist = self.history.history
         fig, axes = plt.subplots(2, 2, figsize=(15, 10))
         metrics = [
@@ -508,11 +563,11 @@ class MuscleArtifactDetector:
             ax.set_xlabel('Epoch'); ax.set_ylabel(title)
             ax.legend(); ax.grid(True, alpha=0.3)
 
-        plt.suptitle('Training History - Muscle Artifact Detector', fontsize=16, fontweight='bold')
+        plt.suptitle('Training History - Eye Movement Detector', fontsize=16, fontweight='bold')
         plt.tight_layout()
-        plt.savefig(f"{self.model_name}_training_history.png", dpi=300, bbox_inches='tight')
+        plt.savefig(os.path.join(self.results_dir, f"{self.model_name}_training_history.png"), dpi=300, bbox_inches='tight')
         plt.show()
-
+    
     def save_model(self, filepath: Optional[str] = None) -> None:
         """
         Save the trained model and training history.
@@ -521,22 +576,22 @@ class MuscleArtifactDetector:
             filepath (str, optional): Model save path. Defaults to `{model_name}.keras`.
         """
         if filepath is None:
-            filepath = f"{self.model_name}.keras"
-
+            filepath = os.path.join(self.results_dir, f"{self.model_name}.keras")
+        
         self.model.save(filepath)
         self.logger.info(f"Model saved to {filepath}")
 
         if self.history:
-            hist_path = f"{self.model_name}_history.json"
+            hist_path = os.path.join(self.results_dir, f"{self.model_name}_history.json")
             with open(hist_path, 'w') as f:
                 json.dump(self.history.history, f, indent=2)
             self.logger.info(f"Training history saved to {hist_path}")
 
 
 def main() -> None:
-    """Main pipeline for training and evaluating the muscle artifact detector."""
-    logger.info("Initializing Muscle Artifact Detector")
-    detector = MuscleArtifactDetector(model_name="edl_cnn_muscle", verbose=True)
+    """Main pipeline for training and evaluating the eye movement detector."""
+    logger.info("Initializing Eye Movement Detector")
+    detector = EyeMovementDetector(model_name="edl_cnn_eye", verbose=True)
 
     detector.load_data()
     detector.build_model(model_type='lightweight')
@@ -544,8 +599,8 @@ def main() -> None:
     detector.evaluate()
     detector.plot_training_history()
     detector.save_model()
-
-    logger.info("Muscle artifact detection pipeline completed.")
+    
+    logger.info("Eye movement detection pipeline completed.")
 
 
 if __name__ == "__main__":
