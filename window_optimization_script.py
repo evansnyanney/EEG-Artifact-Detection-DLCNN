@@ -75,11 +75,11 @@ def _print_summary(results: dict, title: str) -> None:
     if not ok:
         print("No successful runs to summarize.")
         return
-    print("Window | Sensitivity | Specificity | ROC AUC | pROC@0.1 | F1")
-    print("-" * 80)
+    print("Window | Accuracy | Precision | Recall | Specificity | ROC AUC | pROC@0.1 | F1")
+    print("-" * 100)
     for w in sorted(ok.keys()):
         r = ok[w]
-        print(f"{w:6.1f}s |    {_sf(r.get('sensitivity')):.3f}   |    {_sf(r.get('specificity')):.3f}   | {_sf(r.get('roc_auc')):.3f}   |   {_sf(r.get('partial_roc_auc')):.4f}   | {_sf(r.get('f1_score')):.3f}")
+        print(f"{w:6.1f}s |   {_sf(r.get('accuracy')):.3f}   |   {_sf(r.get('precision')):.3f}   |  {_sf(r.get('sensitivity')):.3f}   |    {_sf(r.get('specificity')):.3f}   | {_sf(r.get('roc_auc')):.3f}   |   {_sf(r.get('partial_roc_auc')):.4f}   | {_sf(r.get('f1_score')):.3f}")
     best_sens = max(ok.items(), key=lambda x: _sf(x[1].get('sensitivity')))
     best_roc = max(ok.items(), key=lambda x: _sf(x[1].get('roc_auc')))
     best_proc = max(ok.items(), key=lambda x: _sf(x[1].get('partial_roc_auc')))
@@ -163,6 +163,8 @@ def _sweep(target_name: str, detector_script: str, results_file: str, args):
 
             out = r3.stdout
             metrics = {
+                'accuracy': _extract_metric_any(out, ['Accuracy', 'Accuracy     :']),
+                'precision': _extract_metric_any(out, ['Precision', 'Precision    :']),
                 'roc_auc': _extract_metric_any(out, ['AUC (ROC)', 'ROC AUC']),
                 'pr_auc': _extract_metric_any(out, ['AUC (PR)', 'PR AUC (original)']),
                 'pr_auc_adj': _extract_metric_any(out, ['PR-AUC (Prevalence-Adjusted', 'PR AUC (prevalence-adj)']),

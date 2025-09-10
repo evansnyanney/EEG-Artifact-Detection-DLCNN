@@ -5,26 +5,26 @@
     0
   ],
   "negative_class": 6,
-  "total_samples": 138081,
-  "positive_samples": 32051,
-  "negative_samples": 106030,
-  "train_samples": 80385,
-  "val_samples": 26997,
-  "test_samples": 30699,
+  "total_samples": 5916,
+  "positive_samples": 2563,
+  "negative_samples": 3353,
+  "train_samples": 3428,
+  "val_samples": 1185,
+  "test_samples": 1303,
   "split_source": "patient-level (from split_indices.npz)",
   "focal_loss_params": {
     "gamma": 2.0,
     "alpha": 0.25
   },
   "class_weights": {
-    "0": 0.6702212809951809,
-    "1": 1.9686765282131662
+    "0": 0.9165775401069519,
+    "1": 1.1001283697047497
   },
   "input_shape_3d": [
-    250,
+    5000,
     22
   ],
   "data_format": "3D (n_samples, n_timepoints, n_channels) for 1D CNN",
-  "n_timepoints": 250,
+  "n_timepoints": 5000,
   "n_channels": 22
 }

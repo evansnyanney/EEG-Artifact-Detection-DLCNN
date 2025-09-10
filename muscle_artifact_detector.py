@@ -86,7 +86,7 @@ def focal_loss_with_class_weights(alpha=0.25, gamma=2.0, class_weights=None):
         # Calculate focal loss
         focal_loss = -alpha_t * tf.keras.backend.pow(1 - p_t, gamma) * tf.keras.backend.log(p_t)
         
-        # Apply additional class weights if provided
+        # Apply additional class weights if needed
         if class_weights is not None:
             # Convert string keys to integers if needed
             weight_1 = class_weights.get(1, class_weights.get("1", 1.0))

@@ -571,13 +571,23 @@ class EEGPreprocessingPipeline:
 
 def main() -> None:
     """Run the full preprocessing pipeline."""
+    import argparse
+    
+    parser = argparse.ArgumentParser(description='EEG preprocessing pipeline')
+    parser.add_argument('--window-seconds', type=float, default=1.0,
+                       help='Window size in seconds')
+    parser.add_argument('--overlap', type=float, default=0.0,
+                       help='Window overlap fraction')
+    
+    args = parser.parse_args()
+    
     logger.info("Starting EEG preprocessing pipeline")
 
     pipeline = EEGPreprocessingPipeline(
         target_sampling_rate=250,
         target_channels=22,
-        window_size=1.0,
-        overlap=0.0,
+        window_size=args.window_seconds,
+        overlap=args.overlap,
         min_artifact_duration=0.1,
         include_clean_windows=True,
         use_logging=True,
