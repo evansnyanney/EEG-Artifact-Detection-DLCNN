@@ -105,6 +105,7 @@ class EEGPreprocessingPipeline:
             'eyem_shiv': 0,
             'shiv_elec': 4,
             # Background and seizures (exclude)
+            
             'bckg': -1,
             'cpsz': -1,
             'fnsz': -1,

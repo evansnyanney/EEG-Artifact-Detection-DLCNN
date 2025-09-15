@@ -496,6 +496,7 @@ class MuscleArtifactDetector:
         # Save plots
         self._save_evaluation_plots(fpr, tpr, roc_auc, precision_val, recall_val, pr_auc, cm, chosen_thr, y_proba_test, y_true_test)
         self._plot_pr_curve(recall_val, precision_val, best_threshold, best_idx)
+        self.plot_confusion_matrix(y_true_test, y_pred_test, chosen_thr)
 
         return {
             'threshold': float(best_threshold),
@@ -578,6 +579,34 @@ class MuscleArtifactDetector:
         plt.tight_layout()
         plt.savefig(os.path.join(self.results_dir, f"{self.model_name}_comprehensive_evaluation.png"), dpi=300, bbox_inches='tight')
         plt.close()
+    
+    def plot_confusion_matrix(self, y_true: np.ndarray, y_pred: np.ndarray, threshold: float) -> None:
+        """Plot and save a dedicated confusion matrix with enhanced visualization."""
+        cm = confusion_matrix(y_true, y_pred)
+        
+        # Calculate percentages for display
+        cm_percent = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis] * 100
+        
+        # Create figure with enhanced styling
+        plt.figure(figsize=(8, 6))
+        
+        # Create heatmap with single-color gradient
+        sns.heatmap(cm, annot=True, fmt='d', cmap='magma', 
+                   xticklabels=['Clean', 'Muscle Artifacts'],
+                   yticklabels=['Clean', 'Muscle Artifacts'],
+                   cbar_kws={'label': 'Count'},
+                   linewidths=2, linecolor='white')
+        
+        
+        plt.title(f'Confusion Matrix - Muscle Artifact Detector\nThreshold = {threshold:.3f}', 
+                 fontsize=14, fontweight='bold', pad=20)
+        plt.xlabel('Predicted Label', fontsize=12, fontweight='bold')
+        plt.ylabel('True Label', fontsize=12, fontweight='bold')
+        
+        
+        plt.tight_layout()
+        plt.savefig(os.path.join(self.results_dir, f"{self.model_name}_confusion_matrix.png"), dpi=300, bbox_inches='tight')
+        plt.show()
     
     def plot_training_history(self) -> None:
         """Plot training/validation loss and metrics over epochs."""
