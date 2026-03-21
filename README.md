@@ -60,9 +60,9 @@ artifact_identification/          # Root repository
 │   ├── exploration.py            # Dataset exploration and analysis
 │   ├── detectors/                # Artifact detectors
 │   │   ├── __init__.py
-│   │   ├── eye_movement.py       # EDL-CNN for eye movement artifacts
-│   │   ├── muscle.py             # EDL-CNN for muscle artifacts
-│   │   ├── non_physiological.py  # EDL-CNN for non-physiological artifacts
+│   │   ├── eye_movement.py       # DLCNN for eye movement artifacts
+│   │   ├── muscle.py             # DLCNN for muscle artifacts
+│   │   ├── non_physiological.py  # DLCNN for non-physiological artifacts
 │   │   └── rule_based.py         # Heuristic rule-based detectors
 │   ├── evaluation/               # Model evaluation
 │   │   ├── __init__.py

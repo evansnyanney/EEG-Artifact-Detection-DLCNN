@@ -2,7 +2,7 @@
 """
 CNN vs Rule-Based Artifact Detection Evaluation
 
-Compares trained EDL-CNN models against rule-based heuristic detectors
+Compares trained DLCNN models against rule-based heuristic detectors
 for EEG artifact detection across three artifact categories.
 
 Authors: Evans Nyanney, Parthasarathy D Thirumala, Shyam Visweswaran, Zhaohui Geng
@@ -180,7 +180,7 @@ def _compute_metrics(y_true, y_pred):
 
 def evaluate_model(model_key: str, model_prefix: str, pretty_name: str) -> None:
     """
-    Compare EDL-CNN vs rule-based detection for a given artifact type.
+    Compare DLCNN vs rule-based detection for a given artifact type.
 
     Args:
         model_key: Dataset identifier (e.g., ``'eye_movement'``).

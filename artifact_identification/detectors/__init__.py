@@ -1,5 +1,5 @@
 """
-EDL-CNN artifact detectors for EEG signals.
+DLCNN artifact detectors for EEG signals.
 
 Each detector implements a lightweight 1D-CNN for binary classification
 of a specific artifact type.

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Eye Movement Detector using Enhanced Deep Lightweight CNN (EDL-CNN)
+Eye Movement Detector using Deep Lightweight CNN (DLCNN)
 
 Binary classifier for detecting eye movement artifacts in EEG data.
 Uses a lightweight 1D-CNN architecture with focal loss for class imbalance.
@@ -55,7 +55,7 @@ __all__ = ['EyeMovementDetector']
 
 class EyeMovementDetector:
     """
-    EDL-CNN for binary classification of eye movement artifacts in EEG.
+    DLCNN for binary classification of eye movement artifacts in EEG.
 
     Classifies EEG segments as clean or contaminated with eye movement
     artifacts (blinks, saccades). Uses a lightweight architecture to

@@ -1,9 +1,9 @@
 """
-artifact_identification - EEG Artifact Detection with EDL-CNN and Rule-Based Methods
+artifact_identification - EEG Artifact Detection with DLCNN and Rule-Based Methods
 =====================================================================================
 
-This package implements end-to-end EEG artifact detection using an Enhanced Deep
-Lightweight 1D Convolutional Neural Network (EDL-CNN) together with literature-based
+This package implements end-to-end EEG artifact detection using a Deep
+Lightweight 1D Convolutional Neural Network (DLCNN) together with literature-based
 rule-based methods. It targets three artifact categories derived from TUH annotations:
 
 - **Eye movements** (EYE)
@@ -17,7 +17,7 @@ preprocessing
 data_preparation
     Binary dataset preparation for per-target model training.
 detectors
-    EDL-CNN detectors and rule-based heuristic detectors.
+    DLCNN detectors and rule-based heuristic detectors.
 evaluation
     CNN vs rule-based comparison and standalone rule-based evaluation.
 exploration

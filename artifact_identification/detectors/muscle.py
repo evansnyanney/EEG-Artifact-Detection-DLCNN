@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Muscle Artifact Detector using Enhanced Deep Lightweight CNN (EDL-CNN)
+Muscle Artifact Detector using Deep Lightweight CNN (DLCNN)
 
 Binary classifier for detecting muscle artifacts (EMG, chewing, shivering) in EEG data.
 
@@ -99,7 +99,7 @@ class F1EarlyStopping(callbacks.Callback):
 
 class MuscleArtifactDetector:
     """
-    EDL-CNN for binary classification of muscle artifacts in EEG.
+    DLCNN for binary classification of muscle artifacts in EEG.
 
     Classifies EEG segments as clean or contaminated with muscle artifacts
     (EMG, chewing, shivering). Uses a lightweight or standard CNN with focal loss.

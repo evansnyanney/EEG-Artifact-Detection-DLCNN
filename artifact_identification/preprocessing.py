@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-EEG Preprocessing Pipeline for Enhanced Deep Lightweight CNN (EDL-CNN)
+EEG Preprocessing Pipeline for Deep Lightweight CNN (DLCNN)
 
 A comprehensive pipeline for preprocessing EEG data for deep learning-based artifact detection.
 Handles variable sampling rates, channel configurations, and implements standardized steps
@@ -47,7 +47,7 @@ __all__ = ['EEGPreprocessingPipeline']
 
 class EEGPreprocessingPipeline:
     """
-    EEG preprocessing pipeline for artifact detection using EDL-CNN.
+    EEG preprocessing pipeline for artifact detection using DLCNN.
 
     This class handles end-to-end preprocessing of EEG data:
     - Bipolar montage creation
@@ -416,9 +416,9 @@ class EEGPreprocessingPipeline:
         }
 
     def prepare_training_data(self, results: Dict[str, Any]) -> Dict[str, Any]:
-        """Prepare data for EDL-CNN training with patient-level splitting."""
+        """Prepare data for DLCNN training with patient-level splitting."""
         if self.logger:
-            self.logger.info("Preparing training data for EDL-CNN...")
+            self.logger.info("Preparing training data for DLCNN...")
 
         data_list = [w[0] for w in results['windows']]
         labels = [w[1] for w in results['windows']]

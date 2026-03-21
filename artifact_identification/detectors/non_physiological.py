@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Non-Physiological Artifact Detector using Enhanced Deep Lightweight CNN (EDL-CNN)
+Non-Physiological Artifact Detector using Deep Lightweight CNN (DLCNN)
 
 Binary classifier for detecting non-physiological artifacts (electrode artifacts,
 cable noise) in EEG data.
@@ -57,7 +57,7 @@ _LABEL_ARTIFACT = 'Non-Physiological'
 
 class NonPhysiologicalDetector:
     """
-    EDL-CNN for binary classification of non-physiological artifacts in EEG.
+    DLCNN for binary classification of non-physiological artifacts in EEG.
 
     Classifies EEG segments as clean or contaminated with non-physiological
     artifacts (electrode issues, cable noise). Uses lightweight or standard
