@@ -36,6 +36,9 @@ preprocessed_data/
 *.jpg
 *.jpeg
 
+# Allow README images
+!DOCS/images/*.png
+
 # OS/Editor
 .DS_Store
 .env
