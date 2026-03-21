@@ -1,0 +1,80 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "artifact-identification"
+version = "1.0.0"
+description = "A Deep Lightweight Convolutional Neural Network for Detecting Artifacts in Continuous EEG Signals"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+authors = [
+    {name = "Evans Nyanney"},
+    {name = "Parthasarathy D Thirumala"},
+    {name = "Shyam Visweswaran"},
+    {name = "Zhaohui Geng"},
+]
+keywords = ["EEG", "artifact detection", "deep learning", "CNN", "signal processing", "TUH"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+]
+dependencies = [
+    "numpy>=1.23",
+    "pandas>=1.5",
+    "mne>=1.5",
+    "scikit-learn>=1.2",
+    "joblib>=1.2",
+    "matplotlib>=3.6",
+    "seaborn>=0.12",
+    "scipy>=1.9",
+    "tensorflow>=2.12",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "flake8>=6.0",
+    "black>=23.0",
+    "isort>=5.12",
+]
+
+[project.urls]
+Homepage = "https://github.com/evansnyanney/EEG-Artifact-Detection-DLCNN"
+Repository = "https://github.com/evansnyanney/EEG-Artifact-Detection-DLCNN"
+
+[project.scripts]
+eeg-preprocess = "scripts.preprocess:main"
+eeg-prepare-data = "scripts.prepare_data:main"
+eeg-train-eye = "scripts.train_eye:main"
+eeg-train-muscle = "scripts.train_muscle:main"
+eeg-train-nonphys = "scripts.train_nonphys:main"
+eeg-evaluate-cnn-vs-rules = "scripts.evaluate_cnn_vs_rules:main"
+eeg-evaluate-rules = "scripts.evaluate_rule_based:main"
+eeg-explore = "scripts.explore_data:main"
+
+[tool.setuptools.packages.find]
+include = ["artifact_identification*", "scripts*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v --tb=short"
+
+[tool.black]
+line-length = 100
+target-version = ["py39"]
+
+[tool.isort]
+profile = "black"
+line_length = 100

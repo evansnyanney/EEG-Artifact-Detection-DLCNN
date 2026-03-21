@@ -1,7 +1,17 @@
-﻿# Python
+# Python
 __pycache__/
 *.py[cod]
 *.pyo
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
 
 # Data and caches
 cache/
@@ -15,10 +25,13 @@ checkpoints/
 *.pkl
 *.csv
 
-# Raw data folders (TUH subset)
+# Raw EEG data (TUH - redistribution prohibited)
 edf/
 
-# Plots and large images (optional)
+# Generated / preprocessed data
+preprocessed_data/
+
+# Plots and large images
 *.png
 *.jpg
 *.jpeg
@@ -27,3 +40,14 @@ edf/
 .DS_Store
 .env
 *.log
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
+coverage.xml

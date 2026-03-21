@@ -3,16 +3,10 @@
 Rule-Based Artifact Detection for Preprocessed EEG (TUH-EEG)
 
 Heuristic detectors for eye movement, muscle, and non-physiological artifacts
-in preprocessed EEG data (RobustScaler, 1–40 Hz filtering, average reference).
+in preprocessed EEG data (RobustScaler, 1-40 Hz filtering, average reference).
 
-Functions:
-- detect_eye_movement_tuh_adapted
-- detect_muscle_artifacts_tuh_adapted
-- detect_non_physiological_tuh_adapted
-- run_rules (dispatcher)
-
-Authors: Evans Nyanney, Zhaohui Geng, Parthasarathy Thirumala
-Year: 2024
+Authors: Evans Nyanney, Parthasarathy D Thirumala, Shyam Visweswaran, Zhaohui Geng
+Year: 2025
 License: MIT
 """
 
@@ -20,7 +14,6 @@ import numpy as np
 from scipy.signal import welch
 import warnings
 
-# Suppress runtime warnings (e.g., empty slices, Welch edge cases)
 warnings.filterwarnings('ignore', category=RuntimeWarning)
 warnings.filterwarnings('ignore', category=UserWarning)
 
@@ -29,11 +22,6 @@ __all__ = [
     'detect_muscle_artifacts_tuh_adapted',
     'detect_non_physiological_tuh_adapted',
     'run_rules',
-    # Legacy
-    'detect_eye_faster',
-    'detect_eye',
-    'detect_muscle',
-    'detect_nonphys'
 ]
 
 
@@ -52,7 +40,6 @@ def _bandpower(signal: np.ndarray, fs: float, f_low: float, f_high: float) -> fl
     """
     if len(signal) < 4:
         return 0.0
-
     try:
         freqs, psd = welch(signal, fs=fs, nperseg=min(len(signal), 128), nfft=len(signal))
         band_mask = (freqs >= f_low) & (freqs <= f_high)
@@ -65,10 +52,7 @@ def _bandpower(signal: np.ndarray, fs: float, f_low: float, f_high: float) -> fl
 
 def detect_eye_movement_tuh_adapted(X: np.ndarray, fs: float = 250.0) -> np.ndarray:
     """
-    Detect eye movements in preprocessed EEG data.
-
-    Uses frontal channels and low-frequency dominance (0.5–4 Hz).
-    Adapted for RobustScaler-normalized and bandpass-filtered data.
+    Detect eye movements using frontal-channel low-frequency dominance (0.5-4 Hz).
 
     Args:
         X: 3D array (n_windows, n_timepoints, n_channels).
@@ -83,15 +67,13 @@ def detect_eye_movement_tuh_adapted(X: np.ndarray, fs: float = 250.0) -> np.ndar
 
     low_freq_ratios = []
     amplitudes = []
-
     for i in range(n):
         win = X[i]
         for ch in frontal_channels:
             sig = win[:, ch]
             low_power = _bandpower(sig, fs, 0.5, 4.0)
             total_power = _bandpower(sig, fs, 0.5, 30.0)
-            ratio = low_power / (total_power + 1e-12)
-            low_freq_ratios.append(ratio)
+            low_freq_ratios.append(low_power / (total_power + 1e-12))
             amplitudes.append(np.max(np.abs(sig)))
 
     amp_threshold = np.percentile(amplitudes, 75)
@@ -103,11 +85,10 @@ def detect_eye_movement_tuh_adapted(X: np.ndarray, fs: float = 250.0) -> np.ndar
         for ch in frontal_channels:
             sig = win[:, ch]
             max_amp = np.max(np.abs(sig))
-            high_amp = max_amp > amp_threshold
             low_power = _bandpower(sig, fs, 0.5, 4.0)
             total_power = _bandpower(sig, fs, 0.5, 30.0)
             ratio = low_power / (total_power + 1e-12)
-            if high_amp and ratio > ratio_threshold:
+            if max_amp > amp_threshold and ratio > ratio_threshold:
                 eye_count += 1
         if eye_count >= 1:
             labels[i] = 1
@@ -117,9 +98,7 @@ def detect_eye_movement_tuh_adapted(X: np.ndarray, fs: float = 250.0) -> np.ndar
 
 def detect_muscle_artifacts_tuh_adapted(X: np.ndarray, fs: float = 250.0) -> np.ndarray:
     """
-    Detect muscle artifacts using high-frequency content (20–40 Hz) and variance.
-
-    Adapted for filtered and normalized data.
+    Detect muscle artifacts using high-frequency content (20-40 Hz) and variance.
 
     Args:
         X: 3D array (n_windows, n_timepoints, n_channels).
@@ -133,15 +112,13 @@ def detect_muscle_artifacts_tuh_adapted(X: np.ndarray, fs: float = 250.0) -> np.
 
     hf_ratios = []
     variances = []
-
     for i in range(n):
         win = X[i]
         for ch in range(c):
             sig = win[:, ch]
             hf_power = _bandpower(sig, fs, 20.0, 40.0)
             total_power = _bandpower(sig, fs, 1.0, 40.0)
-            hf_ratio = hf_power / (total_power + 1e-12)
-            hf_ratios.append(hf_ratio)
+            hf_ratios.append(hf_power / (total_power + 1e-12))
             variances.append(np.var(sig))
 
     hf_threshold = np.percentile(hf_ratios, 80)
@@ -181,7 +158,6 @@ def detect_non_physiological_tuh_adapted(X: np.ndarray, fs: float = 250.0) -> np
     variances = []
     gradients = []
     outlier_ratios = []
-
     for i in range(n):
         win = X[i]
         for ch in range(c):
@@ -189,8 +165,7 @@ def detect_non_physiological_tuh_adapted(X: np.ndarray, fs: float = 250.0) -> np
             variances.append(np.var(sig))
             gradients.append(np.mean(np.abs(np.diff(sig))))
             std = np.std(sig)
-            outlier_ratio = np.sum(np.abs(sig) > 3 * std) / len(sig) if std > 0 else 0
-            outlier_ratios.append(outlier_ratio)
+            outlier_ratios.append(np.sum(np.abs(sig) > 3 * std) / len(sig) if std > 0 else 0)
 
     var_low = np.percentile(variances, 5)
     grad_high = np.percentile(gradients, 98)
@@ -205,7 +180,10 @@ def detect_non_physiological_tuh_adapted(X: np.ndarray, fs: float = 250.0) -> np
             has_step = np.mean(np.abs(np.diff(sig))) > grad_high
             std = np.std(sig)
             has_outliers = (np.sum(np.abs(sig) > 3 * std) / len(sig)) > outlier_thresh if std > 0 else False
-            is_saturated = (np.sum(sig == np.max(sig)) > 0.1 * len(sig)) or (np.sum(sig == np.min(sig)) > 0.1 * len(sig))
+            is_saturated = (
+                (np.sum(sig == np.max(sig)) > 0.1 * len(sig)) or
+                (np.sum(sig == np.min(sig)) > 0.1 * len(sig))
+            )
             if is_flat or has_step or has_outliers or is_saturated:
                 artifact_count += 1
         if artifact_count >= max(2, c // 6):
@@ -220,7 +198,7 @@ def run_rules(X: np.ndarray, target: str, fs: float = 250.0) -> np.ndarray:
 
     Args:
         X: 3D EEG data (n_windows, n_timepoints, n_channels).
-        target: One of 'eye', 'muscle', 'nonphys'.
+        target: One of ``'eye'``, ``'muscle'``, ``'nonphys'`` (and common aliases).
         fs: Sampling frequency.
 
     Returns:
@@ -238,23 +216,3 @@ def run_rules(X: np.ndarray, target: str, fs: float = 250.0) -> np.ndarray:
         return detect_non_physiological_tuh_adapted(X, fs)
     else:
         raise ValueError(f"Unknown target: '{target}'. Must be 'eye', 'muscle', or 'nonphys'.")
-
-
-# -----------------------------------------------------------------------------
-# Legacy Aliases
-# -----------------------------------------------------------------------------
-
-def detect_eye_faster(X: np.ndarray, fs: float = 250.0) -> np.ndarray:
-    return detect_eye_movement_tuh_adapted(X, fs)
-
-
-def detect_eye(X: np.ndarray, fs: float = 250.0) -> np.ndarray:
-    return detect_eye_movement_tuh_adapted(X, fs)
-
-
-def detect_muscle(X: np.ndarray, fs: float = 250.0) -> np.ndarray:
-    return detect_muscle_artifacts_tuh_adapted(X, fs)
-
-
-def detect_nonphys(X: np.ndarray, fs: float = 250.0) -> np.ndarray:
-    return detect_non_physiological_tuh_adapted(X, fs)

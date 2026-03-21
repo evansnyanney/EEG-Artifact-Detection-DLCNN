@@ -14,14 +14,15 @@ Key Features:
 - Implements patient-level data splitting to prevent leakage
 - Global normalization using RobustScaler for consistent preprocessing
 
-Authors: Evans Nyanney, Zhaohui Geng, Parthasarathy Thirumala
+Authors: Evans Nyanney, Parthasarathy D Thirumala, Shyam Visweswaran, Zhaohui Geng
 Year: 2025
+License: MIT
 """
 
 import os
 import glob
 import logging
-from typing import List, Tuple, Dict, Any, Optional, DefaultDict
+from typing import List, Tuple, Dict, Any, Optional
 from collections import defaultdict
 from pathlib import Path
 
@@ -32,11 +33,9 @@ from sklearn.preprocessing import RobustScaler
 from joblib import Parallel, delayed
 from sklearn.model_selection import GroupShuffleSplit
 
-# Suppress warnings
 import warnings
 warnings.filterwarnings('ignore')
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -59,17 +58,15 @@ class EEGPreprocessingPipeline:
     - Global normalization for deep learning
 
     Attributes:
-        target_sampling_rate (int): Target sampling rate in Hz.
-        target_channels (int): Target number of channels.
-        window_size (float): Window duration in seconds.
-        overlap (float): Fractional overlap between windows.
-        min_artifact_duration (float): Minimum duration for valid artifacts.
-        include_clean_windows (bool): Whether to include clean segments.
-        clean_label (int): Label assigned to clean windows.
-    
+        target_sampling_rate: Target sampling rate in Hz.
+        target_channels: Target number of channels.
+        window_size: Window duration in seconds.
+        overlap: Fractional overlap between windows.
+        min_artifact_duration: Minimum duration for valid artifacts.
+        include_clean_windows: Whether to include clean segments.
+        clean_label: Label assigned to clean windows.
     """
 
-    # Configuration
     CONFIG = {
         'canonical_channels': [
             'FP1-F7', 'F7-T3', 'T3-T5', 'T5-O1',
@@ -88,29 +85,11 @@ class EEGPreprocessingPipeline:
             ('FP2', 'F4'), ('F4', 'C4'), ('C4', 'P4'), ('P4', 'O2')
         ],
         'artifact_mapping': {
-            # Primary artifacts (6 classes)
-            'eyem': 0,           # Eye movement
-            'musc': 1,           # Muscle artifact
-            'elec': 2,           # Electrode artifact
-            'chew': 3,           # Chewing
-            'shiv': 4,           # Shivering
-            'elpp': 5,           # Non-physiological
-            # Combined artifacts (mapped to primary)
-            'eyem_musc': 0,
-            'eyem_elec': 0,
-            'musc_elec': 1,
-            'eyem_chew': 0,
-            'chew_musc': 3,
-            'chew_elec': 3,
-            'eyem_shiv': 0,
-            'shiv_elec': 4,
-            # Background and seizures (exclude)
-            
-            'bckg': -1,
-            'cpsz': -1,
-            'fnsz': -1,
-            'gnsz': -1,
-            'tcsz': -1,
+            'eyem': 0, 'musc': 1, 'elec': 2, 'chew': 3, 'shiv': 4, 'elpp': 5,
+            'eyem_musc': 0, 'eyem_elec': 0, 'musc_elec': 1,
+            'eyem_chew': 0, 'chew_musc': 3, 'chew_elec': 3,
+            'eyem_shiv': 0, 'shiv_elec': 4,
+            'bckg': -1, 'cpsz': -1, 'fnsz': -1, 'gnsz': -1, 'tcsz': -1,
         }
     }
 
@@ -139,60 +118,40 @@ class EEGPreprocessingPipeline:
         self.window_samples = int(window_size * target_sampling_rate)
         self.step_samples = int(self.window_samples * (1 - overlap))
 
-        # Logger setup
         if use_logging:
             self.logger = logging.getLogger(self.__class__.__name__)
             self.logger.setLevel(logging.INFO if verbose else logging.WARNING)
         else:
             self.logger = None
 
-        # Canonical channels (deduplicated, ordered)
-        seen = set()
+        seen: set = set()
         self.canonical_channels = [
             ch for ch in self.CONFIG['canonical_channels'] if not (ch in seen or seen.add(ch))
         ]
-
-        # Artifact mapping
         self.artifact_mapping = self.CONFIG['artifact_mapping']
-
-        # Global scaler
-        self.scaler = None
-
-        # Statistics
+        self.scaler: Optional[RobustScaler] = None
         self.missing_channels_count = 0
         self.zero_window_files = 0
 
     def create_bipolar_montage(self, raw: mne.io.Raw) -> mne.io.Raw:
-        """
-        Create bipolar montage from raw EEG channels.
-
-        Args:
-            raw: MNE Raw object with raw channels.
-
-        Returns:
-            Raw object with bipolar channels.
-        """
-        # Clean channel names: 'EEG FP1-REF' -> 'FP1'
+        """Create bipolar montage from raw EEG channels."""
         clean_ch_names = {}
         for ch in raw.ch_names:
             if ch.startswith('EEG ') and ch.endswith('-REF'):
-                clean_name = ch[4:-4].upper()
-                clean_ch_names[ch] = clean_name
+                clean_ch_names[ch] = ch[4:-4].upper()
             else:
                 clean_ch_names[ch] = ch.upper()
         raw.rename_channels(clean_ch_names)
 
-        # Create bipolar channels
         available = set(raw.ch_names)
         bipolar_channels = []
         for anode, cathode in self.CONFIG['bipolar_pairs']:
             if anode in available and cathode in available:
-                ch_name = f'{anode}-{cathode}'
-                bipolar_channels.append((anode, cathode, ch_name))
+                bipolar_channels.append((anode, cathode, f'{anode}-{cathode}'))
 
         if not bipolar_channels:
             if self.logger:
-                self.logger.warning("If No valid bipolar pairs found; using original channels.")
+                self.logger.warning("No valid bipolar pairs found; using original channels.")
             return raw
 
         result = mne.set_bipolar_reference(
@@ -204,17 +163,10 @@ class EEGPreprocessingPipeline:
         )
         return result[0] if isinstance(result, tuple) else result
 
-    def load_and_validate_file(self, edf_path: str, csv_path: str) -> Tuple[Optional[mne.io.Raw], Optional[pd.DataFrame]]:
-        """
-        Load and validate EDF and CSV files.
-
-        Args:
-            edf_path: Path to EDF file.
-            csv_path: Path to CSV annotation file.
-
-        Returns:
-            Tuple of (raw, annotations) or (None, None) on error.
-        """
+    def load_and_validate_file(
+        self, edf_path: str, csv_path: str
+    ) -> Tuple[Optional[mne.io.Raw], Optional[pd.DataFrame]]:
+        """Load and validate EDF and CSV files."""
         if csv_path.endswith('_seiz.csv'):
             if self.logger:
                 self.logger.info(f"Skipping seizure file: {csv_path}")
@@ -257,47 +209,37 @@ class EEGPreprocessingPipeline:
         """Resample EEG to target sampling rate."""
         if raw.info['sfreq'] != self.target_sampling_rate:
             if self.logger:
-                self.logger.info(f"Resampling from {raw.info['sfreq']} Hz to {self.target_sampling_rate} Hz")
+                self.logger.info(
+                    f"Resampling from {raw.info['sfreq']} Hz to {self.target_sampling_rate} Hz"
+                )
             raw.resample(self.target_sampling_rate, verbose=False)
         return raw
 
     def standardize_channels(self, raw: mne.io.Raw) -> mne.io.Raw:
-        """
-        Standardize channels to canonical 22-channel bipolar montage.
-    
-        """
-        # Clean and standardize channel names
+        """Standardize channels to canonical 22-channel bipolar montage."""
         raw.rename_channels(lambda x: x.replace('EEG ', '').replace('-REF', '').upper())
 
-        # Try to create bipolar montage if not already present
         has_bipolar = all('-' in ch and not ch.endswith('-REF') for ch in raw.ch_names)
-        has_referenced = all(ch.endswith('-REF') for ch in raw.ch_names)
-
         if not has_bipolar:
             raw = self.create_bipolar_montage(raw)
 
-        # Get current channel names
         current_names = [ch.upper() for ch in raw.ch_names]
         available_channels = []
-
         for canonical in self.canonical_channels:
             if canonical in current_names:
                 idx = current_names.index(canonical)
                 available_channels.append(raw.ch_names[idx])
 
-        # Select up to target_channels
         n_pick = min(len(available_channels), self.target_channels)
         if n_pick > 0:
             selected = available_channels[:n_pick]
             raw.pick_channels(selected, ordered=True, verbose=False)
             data, times = raw[:, :]
         else:
-            # Fallback: pick first few channels
             raw.pick_channels(raw.ch_names[:min(5, len(raw.ch_names))], verbose=False)
             data, times = raw[:, :]
             selected = raw.ch_names[:len(data)]
 
-        # Pad if needed
         if data.shape[0] < self.target_channels:
             n_pad = self.target_channels - data.shape[0]
             padding = np.zeros((n_pad, data.shape[1]))
@@ -307,15 +249,13 @@ class EEGPreprocessingPipeline:
             combined_data = data
             new_ch_names = selected[:self.target_channels]
 
-        # Ensure consistency
-        assert combined_data.shape[0] == len(new_ch_names) == self.target_channels, \
-            f"Channel mismatch: {combined_data.shape[0]} vs {len(new_ch_names)} vs {self.target_channels}"
+        assert combined_data.shape[0] == len(new_ch_names) == self.target_channels
 
         new_info = mne.create_info(new_ch_names, self.target_sampling_rate, ch_types='eeg')
         return mne.io.RawArray(combined_data, new_info, verbose=False)
 
     def apply_preprocessing(self, raw: mne.io.Raw) -> mne.io.Raw:
-        """Apply filtering, referencing, and DC offset removal."""
+        """Apply bandpass (1-40 Hz), notch (50/60 Hz), average reference, and DC removal."""
         if self.logger:
             self.logger.info("Applying bandpass (1-40 Hz) and notch (50/60 Hz) filters...")
         raw.filter(1, 40, verbose=False)
@@ -329,7 +269,9 @@ class EEGPreprocessingPipeline:
         info = mne.create_info(raw.ch_names, self.target_sampling_rate, ch_types='eeg')
         return mne.io.RawArray(data, info, verbose=False)
 
-    def get_window_label(self, annotations: pd.DataFrame, start_time: float, end_time: float) -> Optional[int]:
+    def get_window_label(
+        self, annotations: pd.DataFrame, start_time: float, end_time: float
+    ) -> Optional[int]:
         """Determine the dominant artifact label in a time window."""
         overlapping = annotations[
             (annotations['start_time'] <= end_time) &
@@ -346,7 +288,7 @@ class EEGPreprocessingPipeline:
         if not valid_artifacts:
             return None
 
-        artifact_counts = defaultdict(int)
+        artifact_counts: Dict[int, int] = defaultdict(int)
         for row in valid_artifacts:
             label = self.artifact_mapping[row['label']]
             if label >= 0:
@@ -354,10 +296,12 @@ class EEGPreprocessingPipeline:
 
         return max(artifact_counts.items(), key=lambda x: x[1])[0] if artifact_counts else None
 
-    def create_time_windows(self, raw: mne.io.Raw, annotations: pd.DataFrame) -> List[Tuple[np.ndarray, int]]:
+    def create_time_windows(
+        self, raw: mne.io.Raw, annotations: pd.DataFrame
+    ) -> List[Tuple[np.ndarray, int]]:
         """Extract non-overlapping time windows with labels."""
         data, times = raw[:, :]
-        data = data.T  # (samples, channels)
+        data = data.T
         windows = []
 
         for start_idx in range(0, len(data) - self.window_samples + 1, self.step_samples):
@@ -437,22 +381,19 @@ class EEGPreprocessingPipeline:
                     self.logger.info(f"Processed {i + 1}/{len(file_pairs)} files...")
                 results.append(self.process_single_file(edf, csv))
 
-        # Aggregate results
-        all_windows = []
-        all_sources = []
-        class_counts = defaultdict(int)
+        all_windows: List[Tuple[np.ndarray, int]] = []
+        all_sources: List[str] = []
+        class_counts: Dict[int, int] = defaultdict(int)
         file_stats = []
 
         for i, windows in enumerate(results):
             for _, label in windows:
                 class_counts[label] += 1
-
             file_stats.append({
                 'file': Path(file_pairs[i][0]).name,
                 'windows': len(windows),
                 'classes': list(set(w[1] for w in windows))
             })
-
             all_windows.extend(windows)
             src_id = Path(file_pairs[i][0]).stem
             all_sources.extend([src_id] * len(windows))
@@ -475,9 +416,9 @@ class EEGPreprocessingPipeline:
         }
 
     def prepare_training_data(self, results: Dict[str, Any]) -> Dict[str, Any]:
-        """Prepare data for Enhanced Deep lightweight CNN training with patient-level splitting."""
+        """Prepare data for EDL-CNN training with patient-level splitting."""
         if self.logger:
-            self.logger.info("Preparing training data for Enhanced Deep lightweight CNN...")
+            self.logger.info("Preparing training data for EDL-CNN...")
 
         data_list = [w[0] for w in results['windows']]
         labels = [w[1] for w in results['windows']]
@@ -487,15 +428,12 @@ class EEGPreprocessingPipeline:
 
         if self.logger:
             self.logger.info(f"Data shape: {X.shape}")
-
-        # Global normalization
-        if self.logger:
             self.logger.info("Applying RobustScaler normalization...")
+
         flat = X.reshape(-1, X.shape[2])
         self.scaler = RobustScaler().fit(flat)
         X_norm = self.scaler.transform(flat).reshape(X.shape)
 
-        # Patient-level split
         groups = np.array(results['window_sources'])
         indices = np.arange(len(y))
 
@@ -527,21 +465,21 @@ class EEGPreprocessingPipeline:
             'n_classes': len(np.unique(y))
         }
 
-    def save_data(self, data_dict: Dict[str, Any], results: Dict[str, Any], output_path: str = '.') -> None:
+    def save_data(
+        self, data_dict: Dict[str, Any], results: Dict[str, Any], output_path: str = '.'
+    ) -> None:
         """Save preprocessed data and metadata."""
         if self.logger:
             self.logger.info(f"Saving data to {output_path}...")
 
         os.makedirs(output_path, exist_ok=True)
 
-        # Save 3D arrays
         for key in ['X_train_3d', 'X_val_3d', 'X_test_3d', 'X_all_3d']:
             if key in data_dict:
                 np.save(os.path.join(output_path, f"{key}.npy"), data_dict[key])
                 if self.logger:
                     self.logger.info(f"Saved {key}.npy")
 
-        # Save labels
         for key in ['y_train', 'y_val', 'y_test', 'y_all']:
             if key in data_dict:
                 df = pd.DataFrame({key: data_dict[key]})
@@ -549,67 +487,31 @@ class EEGPreprocessingPipeline:
                 if self.logger:
                     self.logger.info(f"Saved {key}.csv")
 
-        # Save metadata
-        pd.DataFrame(results['file_stats']).to_csv(os.path.join(output_path, 'file_statistics.csv'), index=False)
-        pd.DataFrame(list(results['class_counts'].items()), columns=['class', 'count']) \
-            .to_csv(os.path.join(output_path, 'class_distribution.csv'), index=False)
+        pd.DataFrame(results['file_stats']).to_csv(
+            os.path.join(output_path, 'file_statistics.csv'), index=False
+        )
+        pd.DataFrame(
+            list(results['class_counts'].items()), columns=['class', 'count']
+        ).to_csv(os.path.join(output_path, 'class_distribution.csv'), index=False)
 
-        summary = {k: results[k] for k in ['total_files', 'processed_files', 'total_windows',
-                                           'missing_channels_count', 'zero_window_files']}
-        pd.DataFrame([summary]).to_csv(os.path.join(output_path, 'processing_summary.csv'), index=False)
+        summary = {
+            k: results[k] for k in [
+                'total_files', 'processed_files', 'total_windows',
+                'missing_channels_count', 'zero_window_files'
+            ]
+        }
+        pd.DataFrame([summary]).to_csv(
+            os.path.join(output_path, 'processing_summary.csv'), index=False
+        )
 
-        # Save scaler and indices
         from joblib import dump
         dump(self.scaler, os.path.join(output_path, 'robust_scaler.joblib'))
-        np.savez_compressed(os.path.join(output_path, 'split_indices.npz'),
-                            idx_train=data_dict['idx_train'],
-                            idx_val=data_dict['idx_val'],
-                            idx_test=data_dict['idx_test'])
+        np.savez_compressed(
+            os.path.join(output_path, 'split_indices.npz'),
+            idx_train=data_dict['idx_train'],
+            idx_val=data_dict['idx_val'],
+            idx_test=data_dict['idx_test']
+        )
 
         if self.logger:
             self.logger.info("Preprocessing completed and data saved.")
-
-
-def main() -> None:
-    """Run the full preprocessing pipeline."""
-    import argparse
-    
-    parser = argparse.ArgumentParser(description='EEG preprocessing pipeline')
-    parser.add_argument('--window-seconds', type=float, default=1.0,
-                       help='Window size in seconds')
-    parser.add_argument('--overlap', type=float, default=0.0,
-                       help='Window overlap fraction')
-    
-    args = parser.parse_args()
-    
-    logger.info("Starting EEG preprocessing pipeline")
-
-    pipeline = EEGPreprocessingPipeline(
-        target_sampling_rate=250,
-        target_channels=22,
-        window_size=args.window_seconds,
-        overlap=args.overlap,
-        min_artifact_duration=0.1,
-        include_clean_windows=True,
-        use_logging=True,
-        verbose=True
-    )
-
-    import multiprocessing as mp
-    n_jobs = max(1, mp.cpu_count() - 1)
-
-    results = pipeline.process_dataset(
-        edf_dir='edf/01_tcp_ar',
-        max_files=150,
-        n_jobs=n_jobs
-    )
-
-    data_dict = pipeline.prepare_training_data(results)
-    pipeline.save_data(data_dict, results, output_path='binary_models_data')
-
-    logger.info("Preprocessing completed successfully.")
-    logger.info(f"Total windows: {results['total_windows']}, Classes: {data_dict['n_classes']}")
-
-
-if __name__ == "__main__":
-    main()

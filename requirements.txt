@@ -8,4 +8,9 @@ seaborn>=0.12
 scipy>=1.9
 tensorflow>=2.12
 
-# Optional: if using GPU, install matching tensorflow-gpu via pip or conda
+# Development / testing (optional)
+# pytest>=7.0
+# pytest-cov>=4.0
+# flake8>=6.0
+# black>=23.0
+# isort>=5.12
