@@ -4,9 +4,9 @@
 ![Python Version](https://img.shields.io/badge/python-3.9%2B-blue)
 
 <p align="center">
-  <img src="DOCS/images/eeg_recording_overview.png" alt="EEG recording setup and multi-channel signal trace" width="800"/>
+  <img src="DOCS/images/pipeline_overview.png" alt="EEG Artifact Detection Pipeline Overview" width="900"/>
 </p>
-<p align="center"><em>Typical EEG recording setup showing (A) a subject wearing an electrode cap, (B) scalp electrodes, and (C) multi-channel EEG signals with event codes. Image from Luck (2022), <a href="https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)/12:_Appendix_1:_A_Very_Brief_Introduction_to_EEG_and_ERPs">Applied Event-Related Potential Data Analysis</a>, CC BY 4.0.</em></p>
+<p align="center"><em>End-to-end EEG artifact detection pipeline: data preprocessing (Part 1) and CNN training and testing workflow (Part 2).</em></p>
 
 This repository contains the code for the paper **"A Deep Lightweight Convolutional Neural Network for Detecting Artifacts in Continuous EEG Signals"**.
 
