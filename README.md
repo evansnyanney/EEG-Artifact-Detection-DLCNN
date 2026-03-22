@@ -1,4 +1,4 @@
-# A Deep Lightweight Convolutional Neural Network for Detecting Artifacts in Continuous EEG Signals
+# A Lightweight Deep Convolutional Neural Network for Detecting Artifacts in Continuous EEG Signals
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 ![Python Version](https://img.shields.io/badge/python-3.9%2B-blue)
