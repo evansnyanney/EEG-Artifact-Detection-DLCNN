@@ -38,6 +38,7 @@ preprocessed_data/
 
 # Allow README images
 !DOCS/images/*.png
+!DOCS/images/*.svg
 
 # OS/Editor
 .DS_Store

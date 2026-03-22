@@ -1,0 +1,249 @@
+<svg viewBox="0 0 2400 1650" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6B73FF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4A5BC7;stop-opacity:1" />
+    </linearGradient>
+    <filter id="dropshadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+      <feOffset dx="3" dy="3" result="offset" />
+      <feComponentTransfer><feFuncA type="linear" slope="0.3"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <marker id="arrowhead" markerWidth="12" markerHeight="9" refX="11" refY="4.5" orient="auto">
+      <polygon points="0 0, 12 4.5, 0 9" fill="#2c3e50" />
+    </marker>
+  </defs>
+
+  <rect width="2400" height="1650" fill="white"/>
+
+  <!-- Main Title -->
+  <text x="1200" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="36" font-weight="bold" fill="#333">EEG Artifact Detection Pipeline</text>
+
+  <!-- Part 1 Title -->
+  <text x="1200" y="95" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#6B73FF">Part 1: Data Preprocessing Pipeline</text>
+
+  <!-- ===== TOP ROW: Steps A, B, C ===== -->
+
+  <!-- Step A: Load EDF Files -->
+  <rect x="50" y="130" width="520" height="60" rx="6" fill="url(#headerGrad)" filter="url(#dropshadow)"/>
+  <text x="80" y="168" font-family="Arial, sans-serif" font-size="26" font-weight="bold" fill="white">A</text>
+  <text x="310" y="168" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="white">Load EDF Files</text>
+
+  <rect x="50" y="200" width="520" height="220" fill="white" stroke="#ddd" stroke-width="2" filter="url(#dropshadow)"/>
+  <rect x="75" y="225" width="130" height="100" fill="#E3F2FD" stroke="#1976D2" stroke-width="3" rx="10"/>
+  <text x="140" y="268" text-anchor="middle" font-family="Arial, sans-serif" font-size="26" font-weight="bold" fill="#1976D2">.edf</text>
+  <text x="140" y="298" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#1976D2">Raw EEG</text>
+
+  <text x="230" y="240" font-family="Arial, sans-serif" font-size="17" font-weight="bold" fill="#2c3e50">TUH EEG Corpus</text>
+  <text x="230" y="268" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#555">&#8226; 250&#8211;1000 Hz sampling</text>
+  <text x="230" y="292" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#555">&#8226; 27&#8211;36 channels</text>
+  <text x="230" y="316" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#555">&#8226; 310 total recordings</text>
+  <text x="230" y="340" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#555">&#8226; 150 selected for analysis</text>
+
+  <path d="M 580 310 L 750 310" stroke="#2c3e50" stroke-width="4" fill="none" marker-end="url(#arrowhead)"/>
+
+  <!-- Step B: Load CSV Annotations -->
+  <rect x="760" y="130" width="520" height="60" rx="6" fill="url(#headerGrad)" filter="url(#dropshadow)"/>
+  <text x="790" y="168" font-family="Arial, sans-serif" font-size="26" font-weight="bold" fill="white">B</text>
+  <text x="1020" y="168" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="white">Load CSV Annotations</text>
+
+  <rect x="760" y="200" width="520" height="220" fill="white" stroke="#ddd" stroke-width="2" filter="url(#dropshadow)"/>
+  <rect x="785" y="225" width="130" height="100" fill="#FFF3E0" stroke="#F57C00" stroke-width="3" rx="10"/>
+  <text x="850" y="268" text-anchor="middle" font-family="Arial, sans-serif" font-size="26" font-weight="bold" fill="#F57C00">.csv</text>
+  <text x="850" y="298" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#F57C00">Labels</text>
+
+  <text x="940" y="240" font-family="Arial, sans-serif" font-size="17" font-weight="bold" fill="#2c3e50">Clinical Data</text>
+  <text x="940" y="268" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#555">&#8226; Time-stamped labels</text>
+  <text x="940" y="292" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#555">&#8226; Artifact categories</text>
+  <text x="940" y="316" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#555">&#8226; Expert annotations</text>
+  <text x="940" y="340" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#555">&#8226; Clean/artifact segments</text>
+
+  <path d="M 1290 310 L 1460 310" stroke="#2c3e50" stroke-width="4" fill="none" marker-end="url(#arrowhead)"/>
+
+  <!-- Step C: Standardization -->
+  <rect x="1470" y="130" width="880" height="60" rx="6" fill="url(#headerGrad)" filter="url(#dropshadow)"/>
+  <text x="1500" y="168" font-family="Arial, sans-serif" font-size="26" font-weight="bold" fill="white">C</text>
+  <text x="1910" y="168" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="white">Standardization &amp; Preprocessing</text>
+
+  <rect x="1470" y="200" width="880" height="220" fill="white" stroke="#ddd" stroke-width="2" filter="url(#dropshadow)"/>
+
+  <rect x="1500" y="225" width="160" height="40" fill="#4CAF50" rx="5"/>
+  <text x="1580" y="252" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="white">Resample 250Hz</text>
+  <rect x="1680" y="225" width="160" height="40" fill="#2196F3" rx="5"/>
+  <text x="1760" y="252" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="white">Bipolar 22ch</text>
+  <rect x="1860" y="225" width="160" height="40" fill="#FF9800" rx="5"/>
+  <text x="1940" y="252" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="white">RobustScaler</text>
+  <rect x="2040" y="225" width="160" height="40" fill="#9C27B0" rx="5"/>
+  <text x="2120" y="252" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="white">DC Removal</text>
+
+  <text x="1500" y="300" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#555">&#8226; Exclude seizure files (_seiz.csv)</text>
+  <text x="1500" y="325" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#555">&#8226; Exclude background/seizure labels</text>
+  <text x="1500" y="350" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#555">&#8226; Apply common average reference</text>
+
+  <rect x="1500" y="370" width="820" height="35" fill="#E8F5E8" stroke="#4CAF50" stroke-width="2" rx="5"/>
+  <text x="1910" y="394" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#2E7D32">Output: Standardized EEG (250 Hz, 22 channels)</text>
+
+  <!-- Arrow from C to D -->
+  <path d="M 1910 420 L 1910 460 L 310 460 L 310 500" stroke="#2c3e50" stroke-width="4" fill="none" marker-end="url(#arrowhead)"/>
+
+  <!-- ===== BOTTOM ROW: Steps D, E, F ===== -->
+
+  <!-- Step D: Segmentation -->
+  <rect x="50" y="500" width="520" height="60" rx="6" fill="url(#headerGrad)" filter="url(#dropshadow)"/>
+  <text x="80" y="538" font-family="Arial, sans-serif" font-size="26" font-weight="bold" fill="white">D</text>
+  <text x="310" y="538" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="white">Segmentation into Time Windows</text>
+
+  <rect x="50" y="570" width="520" height="220" fill="white" stroke="#ddd" stroke-width="2" filter="url(#dropshadow)"/>
+
+  <rect x="80" y="595" width="460" height="45" fill="#F3E5F5" stroke="#9C27B0" stroke-width="2" rx="5"/>
+  <text x="310" y="625" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="bold" fill="#7B1FA2">Continuous EEG Signal</text>
+
+  <rect x="80" y="660" width="110" height="35" fill="#E1F5FE" stroke="#0277BD" stroke-width="2" rx="4"/>
+  <text x="135" y="683" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#0277BD">1s W1</text>
+  <rect x="200" y="660" width="110" height="35" fill="#E8F5E8" stroke="#2E7D32" stroke-width="2" rx="4"/>
+  <text x="255" y="683" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2E7D32">1s W2</text>
+  <rect x="320" y="660" width="110" height="35" fill="#FFF3E0" stroke="#F57C00" stroke-width="2" rx="4"/>
+  <text x="375" y="683" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#F57C00">1s W3</text>
+  <text x="470" y="683" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#666">...</text>
+
+  <text x="310" y="725" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#555">1-second windows, 0% overlap</text>
+  <text x="310" y="750" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#555">Map to 6 artifact classes + clean</text>
+  <text x="310" y="775" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#555">Preserve temporal order</text>
+
+  <path d="M 580 680 L 750 680" stroke="#2c3e50" stroke-width="4" fill="none" marker-end="url(#arrowhead)"/>
+
+  <!-- Step E: Binary Datasets -->
+  <rect x="760" y="500" width="520" height="60" rx="6" fill="url(#headerGrad)" filter="url(#dropshadow)"/>
+  <text x="790" y="538" font-family="Arial, sans-serif" font-size="26" font-weight="bold" fill="white">E</text>
+  <text x="1020" y="538" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="white">Prepare Three Binary Datasets</text>
+
+  <rect x="760" y="570" width="520" height="220" fill="white" stroke="#ddd" stroke-width="2" filter="url(#dropshadow)"/>
+
+  <rect x="785" y="595" width="145" height="45" fill="#E91E63" stroke="#AD1457" stroke-width="2" rx="5"/>
+  <text x="857" y="623" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white">Eye Movement</text>
+  <rect x="945" y="595" width="145" height="45" fill="#FF5722" stroke="#D84315" stroke-width="2" rx="5"/>
+  <text x="1017" y="623" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white">Muscle Artifact</text>
+  <rect x="1105" y="595" width="145" height="45" fill="#9C27B0" stroke="#6A1B9A" stroke-width="2" rx="5"/>
+  <text x="1177" y="623" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="white">Non-Physiological</text>
+
+  <rect x="785" y="660" width="470" height="45" fill="#F5F5F5" stroke="#999" stroke-width="2" rx="5"/>
+  <text x="1020" y="682" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#2c3e50">60/20/20 Patient-Level Split</text>
+  <text x="1020" y="698" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#666">Train / Val / Test</text>
+
+  <text x="785" y="730" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#555">&#8226; Focal loss params (&#947;=2.0, &#945;=0.25)</text>
+  <text x="785" y="755" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#555">&#8226; Compute class weights (balanced)</text>
+  <text x="785" y="780" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#555">&#8226; Each task: Artifact type vs Clean EEG</text>
+
+  <path d="M 1290 680 L 1460 680" stroke="#2c3e50" stroke-width="4" fill="none" marker-end="url(#arrowhead)"/>
+
+  <!-- Step F: CNN Input Format -->
+  <rect x="1470" y="500" width="880" height="60" rx="6" fill="url(#headerGrad)" filter="url(#dropshadow)"/>
+  <text x="1500" y="538" font-family="Arial, sans-serif" font-size="26" font-weight="bold" fill="white">F</text>
+  <text x="1910" y="538" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="white">Format for CNN Input</text>
+
+  <rect x="1470" y="570" width="880" height="220" fill="white" stroke="#ddd" stroke-width="2" filter="url(#dropshadow)"/>
+
+  <!-- 3D tensor visual -->
+  <rect x="1830" y="620" width="120" height="60" fill="#6B46C1" stroke="#4C1D95" stroke-width="2" filter="url(#dropshadow)"/>
+  <rect x="1845" y="605" width="120" height="60" fill="#7C3AED" stroke="#4C1D95" stroke-width="2" filter="url(#dropshadow)"/>
+  <rect x="1860" y="590" width="120" height="60" fill="#8B5CF6" stroke="#4C1D95" stroke-width="2" filter="url(#dropshadow)"/>
+  <text x="1920" y="575" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#4C1D95">250</text>
+  <text x="1920" y="700" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#4C1D95">22</text>
+  <text x="2000" y="630" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#4C1D95">batch</text>
+
+  <text x="1500" y="615" font-family="Arial, sans-serif" font-size="17" font-weight="bold" fill="#2c3e50">Input Shape:</text>
+  <text x="1500" y="645" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#555">(batch_size, 250, 22)</text>
+  <text x="1500" y="675" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#555">&#8226; 250 time points (1s @ 250Hz)</text>
+  <text x="1500" y="700" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#555">&#8226; 22 bipolar channels</text>
+  <text x="1500" y="725" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#555">&#8226; Globally normalized (RobustScaler)</text>
+  <text x="1500" y="750" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#555">&#8226; Ready for 1D CNN processing</text>
+
+  <!-- Arrow from F to Part 2 -->
+  <path d="M 1910 790 L 1910 840 L 1200 840 L 1200 880" stroke="#2c3e50" stroke-width="5" fill="none" marker-end="url(#arrowhead)"/>
+
+  <!-- Part 2 Title -->
+  <text x="1200" y="920" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#6B73FF">Part 2: CNN Training &amp; Testing Workflow</text>
+
+  <!-- Phase Labels -->
+  <rect x="20" y="960" width="50" height="430" fill="#ccffcc" opacity="0.8" rx="5"/>
+  <text x="45" y="1175" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="#009900" transform="rotate(-90 45 1175)">Training Phase</text>
+
+  <rect x="2330" y="960" width="50" height="430" fill="#ccccff" opacity="0.8" rx="5"/>
+  <text x="2355" y="1175" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="#0000cc" transform="rotate(-90 2355 1175)">Testing Phase</text>
+
+  <!-- TRAINING PHASE -->
+  <rect x="100" y="960" width="1050" height="430" fill="none" stroke="#66ff66" stroke-width="3" stroke-dasharray="12,6" rx="12"/>
+
+  <rect x="130" y="990" width="440" height="65" fill="#ccffcc" stroke="#009900" stroke-width="2" rx="6"/>
+  <text x="350" y="1022" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#333">Network Initialization</text>
+  <text x="350" y="1045" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#666">Conv1D(16) &#8594; MaxPool &#8594; GAP &#8594; Dense(16) &#8594; Dense(1)</text>
+
+  <path d="M 350 1055 L 350 1090" stroke="#333" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+
+  <rect x="130" y="1090" width="440" height="60" fill="#ccffcc" stroke="#009900" stroke-width="2" rx="6"/>
+  <text x="350" y="1118" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#333">Feature Extraction</text>
+  <text x="350" y="1140" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#666">1D convolution on EEG segments</text>
+
+  <path d="M 350 1150 L 350 1185" stroke="#333" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+
+  <rect x="130" y="1185" width="440" height="60" fill="#ccffcc" stroke="#009900" stroke-width="2" rx="6"/>
+  <text x="350" y="1213" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#333">Model Training</text>
+  <text x="350" y="1235" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#666">Focal loss, Adam optimizer, Early stopping</text>
+
+  <path d="M 350 1245 L 350 1280" stroke="#333" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+
+  <!-- Decision diamond -->
+  <g transform="translate(350, 1325)">
+    <path d="M 0 -50 L 60 0 L 0 50 L -60 0 Z" fill="#ccffcc" stroke="#009900" stroke-width="2"/>
+    <text x="0" y="-8" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#333">Loss</text>
+    <text x="0" y="14" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#333">Converged?</text>
+  </g>
+
+  <path d="M 290 1325 L 100 1325 L 100 1215 L 130 1215" stroke="#333" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+  <text x="240" y="1315" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#C62828">NO</text>
+
+  <path d="M 410 1325 L 620 1325" stroke="#333" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+  <text x="450" y="1315" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#2E7D32">YES</text>
+
+  <rect x="620" y="1295" width="480" height="65" fill="#ccffcc" stroke="#009900" stroke-width="2" rx="6"/>
+  <text x="860" y="1325" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#333">Trained Model</text>
+  <text x="860" y="1350" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#666">Save best weights (val_auc) &#8212; Total params: 2,065</text>
+
+  <!-- Arrow from trained model to testing -->
+  <path d="M 1100 1325 L 1250 1325 L 1250 1022 L 1310 1022" stroke="#333" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+
+  <!-- TESTING PHASE -->
+  <rect x="1300" y="960" width="1010" height="430" fill="none" stroke="#6666ff" stroke-width="3" stroke-dasharray="12,6" rx="12"/>
+
+  <rect x="1330" y="990" width="380" height="65" fill="#ccccff" stroke="#0000cc" stroke-width="2" rx="6"/>
+  <text x="1520" y="1022" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#333">Test Dataset Loading</text>
+  <text x="1520" y="1045" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#666">20% held-out patients</text>
+
+  <path d="M 1520 1055 L 1520 1090" stroke="#333" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+
+  <rect x="1330" y="1090" width="380" height="60" fill="#ccccff" stroke="#0000cc" stroke-width="2" rx="6"/>
+  <text x="1520" y="1118" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#333">Feature Extraction</text>
+  <text x="1520" y="1140" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#666">Same CNN forward pass</text>
+
+  <path d="M 1520 1150 L 1520 1185" stroke="#333" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+
+  <rect x="1330" y="1185" width="380" height="60" fill="#ccccff" stroke="#0000cc" stroke-width="2" rx="6"/>
+  <text x="1520" y="1213" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#333">Binary Classification</text>
+  <text x="1520" y="1235" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#666">Artifact vs Clean prediction</text>
+
+  <path d="M 1520 1245 L 1520 1280" stroke="#333" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+
+  <rect x="1330" y="1280" width="380" height="100" fill="#ccccff" stroke="#0000cc" stroke-width="2" rx="6"/>
+  <text x="1520" y="1310" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#333">Performance Metrics</text>
+  <text x="1520" y="1338" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#666">Accuracy, AUC, Precision, Recall</text>
+  <text x="1520" y="1358" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#666">Confusion Matrix, ROC Curve</text>
+  <text x="1520" y="1375" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" font-style="italic" fill="#666">Computed for each of 3 binary tasks</text>
+
+  <!-- Three Binary Tasks box -->
+  <rect x="1760" y="1060" width="320" height="140" fill="#f5f5f5" stroke="#999" stroke-width="2" rx="12"/>
+  <text x="1920" y="1095" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#333">Three Binary Tasks</text>
+  <text x="1920" y="1125" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#E91E63">1. Eye Movement vs Clean</text>
+  <text x="1920" y="1155" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#FF5722">2. Muscle Artifact vs Clean</text>
+  <text x="1920" y="1185" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#9C27B0">3. Non-Physiological vs Clean</text>
+</svg>
