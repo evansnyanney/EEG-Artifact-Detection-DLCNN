@@ -4,7 +4,7 @@
 ![Python Version](https://img.shields.io/badge/python-3.9%2B-blue)
 
 <p align="center">
-  <img src="DOCS/images/pipeline_overview.svg" alt="EEG Artifact Detection Pipeline Overview" width="100%"/>
+  <img src="DOCS/images/pipeline_overview.png" alt="EEG Artifact Detection Pipeline Overview" width="100%"/>
 </p>
 <p align="center"><em>End-to-end EEG artifact detection pipeline: data preprocessing (Part 1) and CNN training and testing workflow (Part 2).</em></p>
 
