@@ -180,12 +180,16 @@ Plots saved per run include training history, ROC/PR curves, confusion matrix, a
 
 If this repository is useful in your work, please cite:
 
+> E. Nyanney, P.D. Thirumala, S. Visweswaran, Z. Geng, A lightweight deep convolutional neural network for detecting artifacts in continuous EEG signals, *Clinical Neurophysiology Practice* (2026). https://doi.org/10.1016/j.cnp.2026.03.005
+
 ```bibtex
-@article{nyanney2025dlcnn,
-  title={A Deep Lightweight Convolutional Neural Network for Detecting Artifacts in Continuous EEG Signals},
+@article{nyanney2026dlcnn,
+  title={A lightweight deep convolutional neural network for detecting artifacts in continuous EEG signals},
   author={Nyanney, Evans and Thirumala, Parthasarathy D and Visweswaran, Shyam and Geng, Zhaohui},
-  year={2025},
-  url={https://github.com/evansnyanney/EEG-Artifact-Detection-DLCNN}
+  journal={Clinical Neurophysiology Practice},
+  year={2026},
+  doi={10.1016/j.cnp.2026.03.005},
+  url={https://doi.org/10.1016/j.cnp.2026.03.005}
 }
 ```
 
