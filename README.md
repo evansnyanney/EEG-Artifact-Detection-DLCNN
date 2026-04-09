@@ -8,7 +8,7 @@
 </p>
 <p align="center"><em>End-to-end EEG artifact detection pipeline: data preprocessing (Part 1) and CNN training and testing workflow (Part 2).</em></p>
 
-This repository contains the code for the paper **"A Deep Lightweight Convolutional Neural Network for Detecting Artifacts in Continuous EEG Signals"**.
+This repository contains the code for the paper **"A Lightweight Deep Convolutional Neural Network for Detecting Artifacts in Continuous EEG Signals"**.
 
 It implements end-to-end EEG artifact detection using a Deep Lightweight 1D Convolutional Neural Network (DLCNN), together with literature-based rule-based methods. It targets three artifact categories derived from TUH annotations:
 
