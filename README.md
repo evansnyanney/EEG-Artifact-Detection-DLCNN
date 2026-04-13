@@ -1,4 +1,5 @@
 # A Lightweight Deep Convolutional Neural Network for Detecting Artifacts in Continuous EEG Signals
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19554506.svg)](https://doi.org/10.5281/zenodo.19554506)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 ![Python Version](https://img.shields.io/badge/python-3.9%2B-blue)
@@ -178,21 +179,38 @@ Plots saved per run include training history, ROC/PR curves, confusion matrix, a
 
 ## Citation
 
-If this repository is useful in your work, please cite:
+If this repository is useful in your work, please cite both the paper and the software:
 
-> E. Nyanney, P.D. Thirumala, S. Visweswaran, Z. Geng, A lightweight deep convolutional neural network for detecting artifacts in continuous EEG signals, *Clinical Neurophysiology Practice* (2026). https://doi.org/10.1016/j.cnp.2026.03.005
+**Paper:**
+> E. Nyanney, P.D. Thirumala, S. Visweswaran, Z. Geng, A lightweight deep convolutional neural network for detecting artifacts in continuous EEG signals, *Clinical Neurophysiology Practice*, 11 (2026) 208–215. https://doi.org/10.1016/j.cnp.2026.03.005
 
-```bibtex
+**Software:**
+> E. Nyanney, P.D. Thirumala, S. Visweswaran, Z. Geng, EEG-Artifact-Detection-DLCNN: A Lightweight Deep Convolutional Neural Network for Detecting Artifacts in Continuous EEG Signals (v1.0.0), Zenodo (2026). https://doi.org/10.5281/zenodo.19554506
+
+### BibTeX
+
+~~~bibtex
 @article{nyanney2026dlcnn,
   title={A lightweight deep convolutional neural network for detecting artifacts in continuous EEG signals},
   author={Nyanney, Evans and Thirumala, Parthasarathy D and Visweswaran, Shyam and Geng, Zhaohui},
   journal={Clinical Neurophysiology Practice},
   year={2026},
+  volume={11},
+  pages={208--215},
   doi={10.1016/j.cnp.2026.03.005},
   url={https://doi.org/10.1016/j.cnp.2026.03.005}
 }
-```
 
+@software{nyanney2026dlcnn_software,
+  title={EEG-Artifact-Detection-DLCNN: A Lightweight Deep Convolutional Neural Network for Detecting Artifacts in Continuous EEG Signals},
+  author={Nyanney, Evans and Thirumala, Parthasarathy D and Visweswaran, Shyam and Geng, Zhaohui},
+  year={2026},
+  version={v1.0.0},
+  publisher={Zenodo},
+  doi={10.5281/zenodo.19554506},
+  url={https://doi.org/10.5281/zenodo.19554506}
+}
+~~~
 For data, please acknowledge the Temple University Hospital EEG Corpus (TUH).
 
 ## License
