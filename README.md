@@ -46,7 +46,7 @@ pip install -r requirements.txt
 
 This repository includes the trained inference assets, training code, and evaluation scripts used in the release. The TUH EEG Artifact Corpus used in this study is available through the Temple University Hospital EEG Corpus at <https://isip.piconepress.com/projects/nedc/html/tuh_eeg/>. Access requires completion of a data use agreement form submitted to [help@nedcdata.org](mailto:help@nedcdata.org).
 
-The published inference bundle.
+**The published inference bundle.**
 
 | Asset Type | Location |
 |---|---|
