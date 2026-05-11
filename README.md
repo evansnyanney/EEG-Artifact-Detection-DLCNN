@@ -44,9 +44,9 @@ pip install -r requirements.txt
 
 ## Data Availability
 
-All code, trained inference assets, and evaluation scripts are publicly available in this repository. The TUH EEG Artifact Corpus used in this study is available through the Temple University Hospital EEG Corpus at <https://isip.piconepress.com/projects/nedc/html/tuh_eeg/>. Access requires completion of a data use agreement form submitted to [help@nedcdata.org](mailto:help@nedcdata.org).
+This repository includes the trained inference assets, training code, and evaluation scripts used in the release. The TUH EEG Artifact Corpus used in this study is available through the Temple University Hospital EEG Corpus at <https://isip.piconepress.com/projects/nedc/html/tuh_eeg/>. Access requires completion of a data use agreement form submitted to [help@nedcdata.org](mailto:help@nedcdata.org).
 
-The published inference bundle currently includes:
+The published inference bundle.
 
 | Asset Type | Location |
 |---|---|
@@ -57,7 +57,7 @@ The published inference bundle currently includes:
 | Detector input manifests | `binary_models_data/*/metadata.json` |
 | Consolidated asset index | `inference_assets_manifest.json` |
 
-These release assets were generated from `edf/01_tcp_ar` using `max_files=150`, the default `window_size=1.0` second, `250 Hz` sampling, and the standard `22`-channel bipolar montage. Large intermediate arrays (`.npy`) and split files (`.npz`) remain excluded from version control due to their size.
+These release assets were generated from `edf/01_tcp_ar` using `max_files=150`, non-overlapping `1.0`-second windows, `250 Hz` sampling, and the standard `22`-channel bipolar montage. Large intermediate arrays (`.npy`) and split files (`.npz`) remain excluded from version control due to their size.
 
 To reproduce results locally, download the TUH EEG Artifact Corpus and place the EDF files under `edf/`. Then follow the [Typical Workflow](#typical-workflow) to preprocess, prepare binary datasets, and train/evaluate models.
 
