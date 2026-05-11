@@ -1,0 +1,14 @@
+{
+  "model_name": "edl_cnn_eye",
+  "selected_mode": "youden",
+  "selected_threshold": 0.3958098888397217,
+  "f1_optimal_threshold": 0.45902520418167114,
+  "sensitivity": 0.8916486681065515,
+  "specificity": 0.9019266550627213,
+  "input_shape_3d": [
+    250,
+    22
+  ],
+  "n_timepoints": 250,
+  "n_channels": 22
+}

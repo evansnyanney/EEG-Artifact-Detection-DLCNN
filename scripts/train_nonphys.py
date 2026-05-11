@@ -1,9 +1,29 @@
 #!/usr/bin/env python3
 """Train and evaluate the non-physiological artifact detector."""
 
+import json
 import logging
+import os
 
 from artifact_identification.detectors.non_physiological import NonPhysiologicalDetector
+
+
+def _save_thresholds(detector: NonPhysiologicalDetector, evaluation: dict) -> None:
+    """Persist the detector operating point and input shape for inference use."""
+    payload = {
+        "model_name": detector.model_name,
+        "selected_mode": evaluation["mode"],
+        "selected_threshold": float(evaluation["youden_threshold"]),
+        "f1_optimal_threshold": float(evaluation["threshold"]),
+        "sensitivity": float(evaluation["sensitivity"]),
+        "specificity": float(evaluation["specificity"]),
+        "input_shape_3d": detector.metadata.get("input_shape_3d"),
+        "n_timepoints": int(detector.metadata["n_timepoints"]),
+        "n_channels": int(detector.metadata["n_channels"]),
+    }
+    path = os.path.join(detector.results_dir, f"{detector.model_name}_thresholds.json")
+    with open(path, "w", encoding="utf-8") as handle:
+        json.dump(payload, handle, indent=2)
 
 
 def main():
@@ -15,7 +35,8 @@ def main():
     detector.load_data()
     detector.build_model(model_type='lightweight')
     detector.train(epochs=200, batch_size=128)
-    detector.evaluate()
+    evaluation = detector.evaluate()
+    _save_thresholds(detector, evaluation)
     detector.plot_training_history()
     detector.save_model()
 

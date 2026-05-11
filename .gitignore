@@ -25,6 +25,19 @@ checkpoints/
 *.pkl
 *.csv
 
+# Published inference assets
+!binary_models_data/robust_scaler.joblib
+!results/edl_cnn_eye/edl_cnn_eye.keras
+!results/edl_cnn_muscle/edl_cnn_muscle.keras
+!results/edl_cnn_non_physiological/edl_cnn_non_physiological.keras
+!checkpoints/
+!checkpoints/eye_movement/
+!checkpoints/eye_movement/edl_cnn_eye_best_1778512419.weights.h5
+!checkpoints/muscle/
+!checkpoints/muscle/edl_cnn_muscle_best_1778512872.weights.h5
+!checkpoints/non_physiological/
+!checkpoints/non_physiological/edl_cnn_non_physiological_best_1778512937.weights.h5
+
 # Raw EEG data (TUH - redistribution prohibited)
 edf/
 

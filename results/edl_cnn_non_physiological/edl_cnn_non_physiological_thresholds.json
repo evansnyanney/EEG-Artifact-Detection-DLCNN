@@ -1,0 +1,14 @@
+{
+  "model_name": "edl_cnn_non_physiological",
+  "selected_mode": "youden",
+  "selected_threshold": 0.3587396740913391,
+  "f1_optimal_threshold": 0.5288402438163757,
+  "sensitivity": 0.8777598276790523,
+  "specificity": 0.8889622471640358,
+  "input_shape_3d": [
+    250,
+    22
+  ],
+  "n_timepoints": 250,
+  "n_channels": 22
+}

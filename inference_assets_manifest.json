@@ -1,0 +1,46 @@
+{
+  "generated_on": "2026-05-11",
+  "source_subset": {
+    "edf_dir": "edf/01_tcp_ar",
+    "max_files": 150,
+    "window_seconds": 1.0,
+    "sampling_rate_hz": 250,
+    "n_channels": 22,
+    "montage": "standard 22-channel bipolar"
+  },
+  "shared_assets": {
+    "scaler": "binary_models_data/robust_scaler.joblib"
+  },
+  "detectors": {
+    "eye_movement": {
+      "model": "results/edl_cnn_eye/edl_cnn_eye.keras",
+      "best_weights": "checkpoints/eye_movement/edl_cnn_eye_best_1778512419.weights.h5",
+      "thresholds": "results/edl_cnn_eye/edl_cnn_eye_thresholds.json",
+      "metadata": "binary_models_data/eye_movement/metadata.json",
+      "input_shape_3d": [
+        250,
+        22
+      ]
+    },
+    "muscle_artifacts": {
+      "model": "results/edl_cnn_muscle/edl_cnn_muscle.keras",
+      "best_weights": "checkpoints/muscle/edl_cnn_muscle_best_1778512872.weights.h5",
+      "thresholds": "results/edl_cnn_muscle/edl_cnn_muscle_thresholds.json",
+      "metadata": "binary_models_data/muscle_artifacts/metadata.json",
+      "input_shape_3d": [
+        250,
+        22
+      ]
+    },
+    "non_physiological": {
+      "model": "results/edl_cnn_non_physiological/edl_cnn_non_physiological.keras",
+      "best_weights": "checkpoints/non_physiological/edl_cnn_non_physiological_best_1778512937.weights.h5",
+      "thresholds": "results/edl_cnn_non_physiological/edl_cnn_non_physiological_thresholds.json",
+      "metadata": "binary_models_data/non_physiological/metadata.json",
+      "input_shape_3d": [
+        250,
+        22
+      ]
+    }
+  }
+}

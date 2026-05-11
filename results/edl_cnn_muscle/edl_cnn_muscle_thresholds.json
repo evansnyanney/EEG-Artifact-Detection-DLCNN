@@ -1,0 +1,14 @@
+{
+  "model_name": "edl_cnn_muscle",
+  "selected_mode": "youden",
+  "selected_threshold": 0.3612871468067169,
+  "f1_optimal_threshold": 0.47733476758003235,
+  "sensitivity": 0.9157020634121792,
+  "specificity": 0.9099693895924614,
+  "input_shape_3d": [
+    250,
+    22
+  ],
+  "n_timepoints": 250,
+  "n_channels": 22
+}
