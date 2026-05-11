@@ -48,12 +48,14 @@ All code, trained inference assets, and evaluation scripts are publicly availabl
 
 The published inference bundle currently includes:
 
-- Final trained Keras models in `results/edl_cnn_eye/`, `results/edl_cnn_muscle/`, and `results/edl_cnn_non_physiological/`
-- Best-validation weight checkpoints in `checkpoints/`
-- Shared normalization asset `binary_models_data/robust_scaler.joblib`
-- Detector-specific operating points in `results/*_thresholds.json`
-- Detector input manifests in `binary_models_data/*/metadata.json`
-- Consolidated asset index `inference_assets_manifest.json`
+| Asset Type | Location |
+|---|---|
+| Final trained Keras models | `results/edl_cnn_eye/`, `results/edl_cnn_muscle/`, `results/edl_cnn_non_physiological/` |
+| Best-validation weight checkpoints | `checkpoints/` |
+| Shared normalization asset | `binary_models_data/robust_scaler.joblib` |
+| Detector-specific operating points | `results/*_thresholds.json` |
+| Detector input manifests | `binary_models_data/*/metadata.json` |
+| Consolidated asset index | `inference_assets_manifest.json` |
 
 These release assets were generated from `edf/01_tcp_ar` using `max_files=150`, the default `window_size=1.0` second, `250 Hz` sampling, and the standard `22`-channel bipolar montage. Large intermediate arrays (`.npy`) and split files (`.npz`) remain excluded from version control due to their size.
 
