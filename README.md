@@ -117,9 +117,9 @@ artifact_identification/          # Root repository
 │   └── test_rule_based.py        # Tests for rule-based detectors
 │
 ├── DOCS/                         # Montage and annotation documentation
-├── binary_models_data/           # Preprocessed data (generated)
-├── results/                      # Training results and plots
-└── checkpoints/                  # Model weights (gitignored)
+├── binary_models_data/           # Generated datasets, scaler, and per-detector metadata
+├── results/                      # Trained .keras models, thresholds, histories, and plots
+└── checkpoints/                  # Best-validation .weights.h5 files
 ```
 
 ## Methodological Summary
