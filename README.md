@@ -57,8 +57,6 @@ The published inference bundle.
 | Detector input manifests | `binary_models_data/*/metadata.json` |
 | Consolidated asset index | `inference_assets_manifest.json` |
 
-These release assets were generated from `edf/01_tcp_ar` using `max_files=150`, `250 Hz` sampling, and the standard `22`-channel bipolar montage. Large intermediate arrays (`.npy`) and split files (`.npz`) remain excluded from version control due to their size.
-
 To reproduce results locally, download the TUH EEG Artifact Corpus and place the EDF files under `edf/`. Then follow the [Typical Workflow](#typical-workflow) to preprocess, prepare binary datasets, and train/evaluate models.
 
 ### Using a Different Dataset
