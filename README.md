@@ -26,7 +26,7 @@ The pipeline includes preprocessing, binary dataset preparation per target, mode
 - [Repository Structure](#repository-structure)
 - [Methodological Summary](#methodological-summary)
 - [Typical Workflow](#typical-workflow)
-- [Running Tests](#running-tests)
+- [Running Tests](#running-tests) 
 - [Notes on Models and Checkpoints](#notes-on-models-and-checkpoints)
 - [Metrics and Reporting](#metrics-and-reporting)
 - [Citation](#citation)
